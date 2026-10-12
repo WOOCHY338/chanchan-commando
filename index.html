@@ -704,7 +704,7 @@ function updateUlt(dt){
   else if(G.ultState==='jump_land'){
     if(G.ultT>=.5){G.ultState=null;G.state='play'}}
   else if(G.ultState==='orb_zoom'){
-    if(G.ultT>=1.5){G.ultState='orb_sky';G.ultT=0;G.banner={text:'하늘이 열린다!!',t:2}}}
+    if(G.ultT>=1.5){G.ultState='orb_sky';G.ultT=0}}
   else if(G.ultState==='orb_sky'){
     if(G.ultT>=2){G.ultState='orb_fire';G.ultT=0;sfx.boss();sfx.explode()}}
   else if(G.ultState==='orb_fire'){
