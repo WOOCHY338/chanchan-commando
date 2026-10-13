@@ -112,6 +112,10 @@ canvas{display:block;position:fixed;inset:0}
 .skin-card .sk-name{font-size:16px;font-weight:700;text-align:center}
 .skin-card .sk-badge{font-size:12px;font-weight:700;padding:1px 8px;border:2px solid #111;border-radius:6px;background:#ffe24a}
 .skin-card .sk-badge.on{background:#4caf50;color:#fff}
+#lobbyQuick{position:fixed;top:68px;left:12px;z-index:11;display:flex;gap:6px}
+.qbtn{font-family:inherit;font-size:13px;font-weight:700;padding:4px 10px;background:#fff;border:2.5px solid #111;border-radius:10px;box-shadow:2px 3px 0 #111;cursor:pointer;color:#111}
+.qbtn:active{transform:translate(1px,2px);box-shadow:0 0 0 #111}
+#profileCard .pf-title{font-size:12px;font-weight:700}
 #profileCard{position:fixed;top:12px;left:12px;z-index:11;display:flex;align-items:center;gap:10px;background:#fff;border:3px solid #111;border-radius:14px;padding:6px 14px 6px 6px;box-shadow:3px 4px 0 #111;cursor:pointer;max-width:calc(100vw - 24px)}
 #profileCard .pf-img{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#fbfaf3}
 #profileCard .pf-img img{width:130%;height:auto;display:block;margin:-2px auto 0;transform:translateX(-12%)}
@@ -132,6 +136,7 @@ canvas{display:block;position:fixed;inset:0}
 
 <div id="lobby" class="overlay show">
   <div id="profileCard" onclick="goPage('shop');switchShopTab(3)"></div>
+  <div id="lobbyQuick"><button class="qbtn" onclick="openBP()">🎖️ 배틀패스</button><button class="qbtn" onclick="openQuest()">📋 퀘스트</button></div>
   <div class="logo">찬찬특공개</div>
   <img id="titleDog" alt="">
   <p class="sub">좀비 고양이 왕을 물리쳐라!</p>
@@ -165,6 +170,18 @@ canvas{display:block;position:fixed;inset:0}
     <button class="shop-tab" onclick="switchEquipTab(2)">동료</button>
   </div>
   <div id="equipContent" style="width:100%;max-width:500px;overflow-y:auto;flex:1"></div>
+</div>
+
+<div id="bpPage" class="subpage">
+  <button class="back-link" onclick="goLobby()">← 뒤로</button>
+  <div class="logo small">배틀패스</div>
+  <div id="bpContent" style="width:100%;max-width:500px;overflow-y:auto;flex:1;padding:8px 0"></div>
+</div>
+
+<div id="questPage" class="subpage">
+  <button class="back-link" onclick="goLobby()">← 뒤로</button>
+  <div class="logo small">일일 퀘스트</div>
+  <div id="questContent" style="width:100%;max-width:500px;overflow-y:auto;flex:1;padding:8px 0"></div>
 </div>
 
 <div id="modeSelect" class="subpage">
@@ -384,6 +401,31 @@ const BORDERS=[
 {id:'netherite',name:'네더라이트 테두리',price:300,style:'5px solid #4a4a4a',shadow:'0 0 16px #8e44ad',bg:'linear-gradient(135deg,#2c3e50,#4a4a4a,#2c3e50)'},
 {id:'legendary',name:'레전더리 찬찬 테두리',price:400,style:'5px solid transparent',bg:'linear-gradient(135deg,#f39c12,#e74c3c,#9b59b6,#3498db,#f39c12)',shadow:'0 0 20px #f39c12,0 0 40px #e74c3c'},
 ];
+const TITLES={rookie:{name:'초보 전사',color:'#888'},warrior:{name:'찬찬 용사',color:'#e67e22'},s1master:{name:'시즌 1 마스터',color:'#e74c3c'}};
+const BP_BORDERS={bp_badge:{name:'전투의 증표',style:'4px solid #e67e22',shadow:'0 0 10px #e67e22'},bp_elite:{name:'시즌 1 엘리트',style:'5px solid transparent',bg:'linear-gradient(135deg,#f39c12,#e74c3c,#f39c12)',shadow:'0 0 14px #f39c12'},bp_master:{name:'시즌 1 마스터',style:'5px solid transparent',bg:'linear-gradient(135deg,#ff0000,#ff7700,#ffff00,#00ff00,#0000ff,#8b00ff,#ff0000)',shadow:'0 0 20px #ff0000,0 0 40px #8b00ff'}};
+const BP_REWARDS=[
+{lv:1,type:'gold',val:50,icon:'🪙',desc:'50G'},
+{lv:2,type:'title',val:'rookie',icon:'🏷️',desc:'칭호: 초보 전사'},
+{lv:3,type:'gold',val:100,icon:'🪙',desc:'100G'},
+{lv:4,type:'border',val:'bp_badge',icon:'⭕',desc:'테두리: 전투의 증표'},
+{lv:5,type:'gold',val:150,icon:'🪙',desc:'150G'},
+{lv:6,type:'title',val:'warrior',icon:'🏷️',desc:'칭호: 찬찬 용사'},
+{lv:7,type:'gold',val:200,icon:'🪙',desc:'200G'},
+{lv:8,type:'border',val:'bp_elite',icon:'⭕',desc:'테두리: 시즌 1 엘리트'},
+{lv:9,type:'gold',val:300,icon:'🪙',desc:'300G'},
+{lv:10,type:'title',val:'s1master',icon:'👑',desc:'칭호: 시즌 1 마스터'},
+{lv:10,type:'border',val:'bp_master',icon:'💎',desc:'테두리: 시즌 1 마스터'},
+];
+const QUEST_POOL=[
+{id:'kill30',name:'좀비 30마리 처치',target:30,cat:'kill',xp:15,gold:20,icon:'💀'},
+{id:'kill60',name:'좀비 60마리 처치',target:60,cat:'kill',xp:25,gold:35,icon:'💀'},
+{id:'stage1',name:'스테이지 1회 클리어',target:1,cat:'stage',xp:20,gold:30,icon:'⭐'},
+{id:'stage2',name:'스테이지 2회 클리어',target:2,cat:'stage',xp:35,gold:50,icon:'⭐'},
+{id:'boss1',name:'보스 1회 처치',target:1,cat:'boss',xp:25,gold:40,icon:'👹'},
+{id:'wave5',name:'무한모드 WAVE 5 도달',target:5,cat:'wave',xp:20,gold:25,icon:'🌊'},
+{id:'play3',name:'게임 3회 플레이',target:3,cat:'play',xp:15,gold:20,icon:'🎮'},
+];
+const plvXp=lv=>lv*30;
 const ENEMY={zombie:{r:15,hp:10,spd:48,dmg:6,xp:1},runner:{r:12,hp:7,spd:85,dmg:5,xp:1},tank:{r:27,hp:60,spd:34,dmg:12,xp:5}};
 const BOSSES=[
   {t:90,name:'뚱냥이 대장',hp:1500,spr:'boss1',r:55,spd:55,dmg:12,fish:false},
@@ -466,6 +508,19 @@ let playerName=localStorage.getItem('ccsg_name')||'';
 let ownedBorders=JSON.parse(localStorage.getItem('ccsg_borders')||'["none"]');
 let equippedBorder=localStorage.getItem('ccsg_border')||'none';
 function saveBorders(){localStorage.setItem('ccsg_borders',JSON.stringify(ownedBorders));localStorage.setItem('ccsg_border',equippedBorder)}
+let playerLevel=parseInt(localStorage.getItem('ccsg_plv')||'1');
+let playerXp=parseInt(localStorage.getItem('ccsg_pxp')||'0');
+let ownedTitles=JSON.parse(localStorage.getItem('ccsg_titles')||'[]');
+let equippedTitle=localStorage.getItem('ccsg_title')||'';
+let bpClaimed=JSON.parse(localStorage.getItem('ccsg_bpclaimed')||'[]');
+let dailyData=JSON.parse(localStorage.getItem('ccsg_daily')||'null');
+function savePlayerLv(){localStorage.setItem('ccsg_plv',String(playerLevel));localStorage.setItem('ccsg_pxp',String(playerXp))}
+function saveTitles(){localStorage.setItem('ccsg_titles',JSON.stringify(ownedTitles));localStorage.setItem('ccsg_title',equippedTitle)}
+function saveBP(){localStorage.setItem('ccsg_bpclaimed',JSON.stringify(bpClaimed))}
+function saveDaily(){localStorage.setItem('ccsg_daily',JSON.stringify(dailyData))}
+function gainPlayerXp(amount){playerXp+=amount;while(playerXp>=plvXp(playerLevel)){playerXp-=plvXp(playerLevel);playerLevel++}savePlayerLv()}
+function initDaily(){const today=new Date().toISOString().slice(0,10);if(dailyData&&dailyData.date===today)return;const pool=[...QUEST_POOL],picked=[];for(let i=0;i<3&&pool.length;i++){const idx=Math.floor(Math.random()*pool.length);picked.push({...pool.splice(idx,1)[0],progress:0,done:false,claimed:false})}dailyData={date:today,quests:picked};saveDaily()}
+function questTrack(cat,val){if(!dailyData)return;for(const q of dailyData.quests)if(q.cat===cat&&!q.done){q.progress=Math.min(q.target,q.progress+val);if(q.progress>=q.target)q.done=true}saveDaily()}
 function saveEquip(){localStorage.setItem('ccsg_inv',JSON.stringify(eqInv));localStorage.setItem('ccsg_equip',JSON.stringify(eqEquipped))}
 function newGame(inf){
   G={t:0,state:'play',kills:0,lv:1,xp:0,xpNeed:xpFor(1),pendingLv:0,
@@ -497,7 +552,7 @@ function nearest(x,y,max){let best=null,bd=max*max;for(const e of G.enemies){if(
 /* ---------- 전투 ---------- */
 function hit(e,d,kx=0,ky=0){if(e.dead)return;sfx.hit();G.shake=Math.max(G.shake,1.5);d=Math.max(1,Math.round(d*rnd(.9,1.1)));e.hp-=d;e.flash=.12;if(!e.boss){e.kx+=kx*1.3;e.ky+=ky*1.3}
   if(G.texts.length<80)G.texts.push({x:e.x+rnd(-8,8),y:e.y-e.r,v:d,t:0});if(e.hp<=0)kill(e)}
-function kill(e){e.dead=true;G.kills++;sfx.kill();G.shake=Math.max(G.shake,3.5);G.fx.push({type:'poof',x:e.x,y:e.y,r:e.r*1.3,t:0,dur:.35});
+function kill(e){e.dead=true;G.kills++;sfx.kill();G.shake=Math.max(G.shake,3.5);G.fx.push({type:'poof',x:e.x,y:e.y,r:e.r*1.3,t:0,dur:.35});questTrack('kill',1);if(e.boss)questTrack('boss',1);
   if(equippedUlt){const u=ULTIMATES[equippedUlt];G.ultPts=Math.min(u.pts,G.ultPts+(e.boss?.5:.12))}
   if(e.boss){G.boss=null;G.arena=null;G.shake=14;G.fx.push({type:'boom',x:e.x,y:e.y,r:160,t:0,dur:.6,col:'#ffb02e'});
     for(let i=0;i<14;i++)dropGem(e.x+rnd(-70,70),e.y+rnd(-70,70),12);G.items.push({type:'meat',x:e.x,y:e.y});
@@ -924,11 +979,21 @@ function switchShopTab(idx){
     h+='</div>';el.innerHTML=h}
   else if(idx===3){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div>';
     h+='<div style="text-align:center;margin:12px 0"><div style="position:relative;display:inline-block;width:100px;height:100px;border-radius:50%;overflow:hidden;'+getBorderCSS(equippedBorder)+'"><img src="'+(skinURLs[currentSkin]||dogURL)+'" style="width:130%;height:auto;position:absolute;top:0;left:50%;transform:translateX(-50%)"></div>';
-    h+='<div style="font-size:22px;font-weight:700;margin-top:8px">'+(playerName||'???')+'</div></div>';
+    h+='<div style="font-size:22px;font-weight:700;margin-top:8px">'+(playerName||'???')+'</div>';
+    if(equippedTitle&&TITLES[equippedTitle])h+='<div style="font-size:16px;font-weight:700;color:'+TITLES[equippedTitle].color+'">'+TITLES[equippedTitle].name+'</div>';
+    h+='<div style="font-size:14px;color:#888;margin-top:2px">Lv. '+playerLevel+' ('+playerXp+'/'+plvXp(playerLevel)+' XP)</div></div>';
+    if(ownedTitles.length>0){h+='<div class="equip-title">칭호</div><div class="skin-grid">';
+      h+='<div class="skin-card'+(equippedTitle===''?' selected':'')+'" onclick="equipTitle(\'\')"><div style="font-size:28px;padding:12px">🚫</div><div class="sk-name" style="font-size:13px">칭호 없음</div><div class="sk-badge'+(equippedTitle===''?' on':'')+'">'+(!equippedTitle?'사용 중':'해제')+'</div></div>';
+      for(const id of ownedTitles){const t=TITLES[id];if(!t)continue;const sel=equippedTitle===id;
+        h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="equipTitle(\''+id+'\')"><div style="font-size:28px;padding:12px;color:'+t.color+'">🏷️</div><div class="sk-name" style="font-size:13px;color:'+t.color+'">'+t.name+'</div><div class="sk-badge'+(sel?' on':'')+'">'+(sel?'사용 중':'장착')+'</div></div>'}
+      h+='</div>'}
     h+='<div class="equip-title">테두리</div><div class="skin-grid">';
     BORDERS.forEach(b=>{const own=ownedBorders.indexOf(b.id)>=0,sel=equippedBorder===b.id;
       let btn;if(sel)btn='장착 중';else if(own)btn='장착';else btn=b.price+'G';
       h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'selectBorder':'buyBorder')+'(\''+b.id+'\')"><div style="width:60px;height:60px;border-radius:50%;'+getBorderCSS(b.id)+'background-color:#fbfaf3;margin:8px auto"></div><div class="sk-name" style="font-size:13px">'+b.name+'</div><div class="sk-badge'+(sel?' on':'')+'">'+btn+'</div></div>'});
+    for(const id in BP_BORDERS){const b=BP_BORDERS[id],own=ownedBorders.indexOf(id)>=0,sel=equippedBorder===id;if(!own)continue;
+      let btn=sel?'장착 중':'장착';
+      h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="selectBorder(\''+id+'\')"><div style="width:60px;height:60px;border-radius:50%;'+getBorderCSS(id)+'background-color:#fbfaf3;margin:8px auto"></div><div class="sk-name" style="font-size:13px">'+b.name+'<br><span style="color:#e67e22;font-size:11px">배틀패스</span></div><div class="sk-badge'+(sel?' on':'')+'">'+btn+'</div></div>'}
     h+='</div>';el.innerHTML=h}
   else if(idx===4){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="skin-grid">';SKINS.forEach(s=>{if(!skinURLs[s.id])return;const sel=s.id===currentSkin,own=ownedSkins.indexOf(s.id)>=0;let btn;if(sel)btn='착용 중';else if(own)btn='착용';else btn=s.price+'G';h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'selectSkin':'buySkin')+'(\''+s.id+'\')"><img src="'+skinURLs[s.id]+'" class="skin-preview"><div class="skin-name">'+s.name+'</div><div class="skin-btn">'+btn+'</div></div>'});h+='</div>';el.innerHTML=h}
   else if(idx===2){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="equip-title">동료</div>';
@@ -947,42 +1012,83 @@ function buySkin(id){const s=SKINS.find(sk=>sk.id===id);if(!s||gold<s.price)retu
 function selectSkin(id){sfx.click();currentSkin=id;localStorage.setItem('ccsg_skin',id);loadDog().then(()=>{$('#titleDog').src=dogURL;switchShopTab(4)})}
 function buyUlt(id){const u=ULTIMATES[id];if(!u||gold<u.price)return;sfx.click();gold-=u.price;ownedUlts.push(id);saveGold();saveUlts();equipUlt(id)}
 function equipUlt(id){sfx.click();equippedUlt=id;saveUlts();switchShopTab(1)}
-function getBorderCSS(id){const b=BORDERS.find(x=>x.id===id);if(!b||b.style==='none')return '';let s='border:'+b.style+';';if(b.bg)s+='background-image:'+b.bg+';background-origin:border-box;background-clip:border-box;';if(b.shadow)s+='box-shadow:'+b.shadow+';';return s}
+function getBorderCSS(id){let b=BORDERS.find(x=>x.id===id);if(!b)b=BP_BORDERS[id];if(!b||b.style==='none')return '';let s='border:'+b.style+';';if(b.bg)s+='background-image:'+b.bg+';background-origin:border-box;background-clip:border-box;';if(b.shadow)s+='box-shadow:'+b.shadow+';';return s}
 function buyBorder(id){const b=BORDERS.find(x=>x.id===id);if(!b||gold<b.price)return;sfx.click();gold-=b.price;ownedBorders.push(id);saveGold();saveBorders();selectBorder(id)}
 function selectBorder(id){sfx.click();equippedBorder=id;saveBorders();switchShopTab(3)}
+function openBP(){sfx.click();show('#lobby',false);show('#bpPage',true);$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';buildBP()}
+function buildBP(){const el=$('#bpContent');if(!el)return;
+  let h='<div style="text-align:center;padding:8px 0"><div style="font-size:15px;color:#888">시즌 1</div><div style="font-size:22px;font-weight:700">Lv. '+playerLevel+' <span style="font-size:15px;color:#888">('+playerXp+'/'+plvXp(playerLevel)+' XP)</span></div>';
+  h+='<div style="background:#ddd;border-radius:8px;height:14px;margin:6px 20px;overflow:hidden"><div style="background:linear-gradient(90deg,#f39c12,#e74c3c);height:100%;width:'+Math.min(100,playerXp/plvXp(playerLevel)*100)+'%;border-radius:8px;transition:width .3s"></div></div></div>';
+  for(let lv=1;lv<=10;lv++){const rewards=BP_REWARDS.filter(r=>r.lv===lv),unlocked=playerLevel>=lv;
+    h+='<div style="border:3px solid '+(unlocked?'#111':'#ccc')+';border-radius:14px;padding:12px;margin:6px 16px;background:'+(unlocked?'#fff':'#f5f5f5')+';box-shadow:2px 3px 0 '+(unlocked?'#111':'#ccc')+';display:flex;align-items:center;gap:10px;opacity:'+(unlocked?1:.6)+'">';
+    h+='<div style="font-size:14px;font-weight:700;color:'+(unlocked?'#111':'#999')+';min-width:36px;text-align:center">Lv.'+lv+'</div>';
+    h+='<div style="flex:1">';
+    for(const r of rewards)h+='<div style="font-size:16px">'+r.icon+' '+r.desc+'</div>';
+    h+='</div>';
+    const allClaimed=rewards.every(r=>bpClaimed.indexOf(r.lv+':'+r.type+':'+r.val)>=0);
+    if(!unlocked)h+='<span style="font-size:13px;color:#999">🔒</span>';
+    else if(allClaimed)h+='<span style="font-size:13px;color:#4caf50;font-weight:700">수령 완료</span>';
+    else h+='<button class="btn" style="font-size:14px;padding:3px 12px;min-width:0" onclick="claimBP('+lv+')">수령</button>';
+    h+='</div>'}
+  el.innerHTML=h}
+function claimBP(lv){if(playerLevel<lv)return;const rewards=BP_REWARDS.filter(r=>r.lv===lv);
+  for(const r of rewards){const key=r.lv+':'+r.type+':'+r.val;if(bpClaimed.indexOf(key)>=0)continue;bpClaimed.push(key);
+    if(r.type==='gold'){gold+=r.val;saveGold()}
+    else if(r.type==='title'){if(ownedTitles.indexOf(r.val)<0)ownedTitles.push(r.val);saveTitles()}
+    else if(r.type==='border'){if(ownedBorders.indexOf(r.val)<0)ownedBorders.push(r.val);saveBorders()}}
+  sfx.click();saveBP();buildBP()}
+function openQuest(){sfx.click();show('#lobby',false);show('#questPage',true);$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';initDaily();buildQuest()}
+function buildQuest(){const el=$('#questContent');if(!el||!dailyData)return;
+  const now=new Date(),reset=new Date(now);reset.setHours(24,0,0,0);const left=Math.max(0,Math.floor((reset-now)/1000)),hh=String(Math.floor(left/3600)).padStart(2,'0'),mm=String(Math.floor(left%3600/60)).padStart(2,'0'),ss=String(left%60).padStart(2,'0');
+  let h='<div style="text-align:center;padding:8px 0;font-size:15px;color:#888">리셋까지 '+hh+':'+mm+':'+ss+'</div>';
+  h+='<div style="text-align:center;padding:4px 0;font-size:18px;font-weight:700">Lv. '+playerLevel+' ('+playerXp+'/'+plvXp(playerLevel)+' XP)</div>';
+  for(let i=0;i<dailyData.quests.length;i++){const q=dailyData.quests[i],pct=Math.min(100,q.progress/q.target*100);
+    h+='<div style="border:3px solid '+(q.claimed?'#4caf50':q.done?'#f39c12':'#111')+';border-radius:14px;padding:12px;margin:8px 16px;background:#fff;box-shadow:2px 3px 0 '+(q.claimed?'#4caf50':q.done?'#f39c12':'#111')+'">';
+    h+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:28px">'+q.icon+'</span><div style="flex:1"><div style="font-size:17px;font-weight:700">'+q.name+'</div>';
+    h+='<div style="background:#eee;border-radius:6px;height:10px;margin:4px 0;overflow:hidden"><div style="background:'+(q.done?'#4caf50':'#3498db')+';height:100%;width:'+pct+'%;border-radius:6px"></div></div>';
+    h+='<div style="font-size:13px;color:#888">'+q.progress+'/'+q.target+' · 보상: '+q.xp+' XP + '+q.gold+'G</div></div>';
+    if(q.claimed)h+='<span style="font-size:13px;color:#4caf50;font-weight:700">완료</span>';
+    else if(q.done)h+='<button class="btn" style="font-size:14px;padding:3px 12px;min-width:0" onclick="claimQuest('+i+')">수령</button>';
+    else h+='<span style="font-size:13px;color:#999">진행 중</span>';
+    h+='</div></div>'}
+  el.innerHTML=h}
+function claimQuest(i){if(!dailyData||!dailyData.quests[i]||dailyData.quests[i].claimed)return;const q=dailyData.quests[i];q.claimed=true;gold+=q.gold;saveGold();gainPlayerXp(q.xp);saveDaily();sfx.click();buildQuest()}
+function equipTitle(id){sfx.click();equippedTitle=id;saveTitles();switchShopTab(3)}
 function promptNickname(){const d=document.createElement('div');d.id='nickModal';d.style.cssText='position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6)';
   d.innerHTML='<div style="background:#fff;border:4px solid #111;border-radius:20px;padding:28px;max-width:340px;width:90%;text-align:center;box-shadow:6px 7px 0 #111"><div style="font-size:28px;font-weight:700;margin-bottom:6px">닉네임 설정</div><div style="font-size:16px;color:#e74c3c;margin-bottom:14px">한번 정하면 바꿀 수 없습니다!</div><input id="nickInput" style="font-family:inherit;font-size:22px;padding:8px 14px;border:3px solid #111;border-radius:10px;width:100%;text-align:center;box-sizing:border-box" maxlength="12" placeholder="닉네임 입력"><div style="margin-top:14px"><button class="btn" style="font-size:22px;min-width:120px" onclick="confirmNick()">확인</button></div></div>';
   document.body.appendChild(d);setTimeout(()=>$('#nickInput').focus(),100)}
 function confirmNick(){const v=$('#nickInput').value.trim();if(!v)return;playerName=v;localStorage.setItem('ccsg_name',playerName);const m=$('#nickModal');if(m)m.remove()}
 
 const show=(id,on)=>$(id).classList.toggle('show',on);
-const allScreens=['#lobby','#battlePage','#shopPage','#equipPage','#settingsPage','#modeSelect','#end','#pause','#levelup'];
-function goPage(id){sfx.click();show('#lobby',false);show('#modeSelect',false);show('#'+id+'Page',true);$('#profileCard').style.display='none';if(id==='battle'){buildStageMap();setTimeout(()=>scrollToStage(selectedStage),50)}else if(id==='equip')buildEquipPage();else if(id==='shop')buildShopPage()}
-function goModeSelect(){sfx.click();show('#lobby',false);show('#modeSelect',true);$('#profileCard').style.display='none';const b=parseInt(localStorage.getItem('ccsg_infbest')||'0');$('#infiniteBest').textContent=b?'최고 기록: WAVE '+b:''}
-function updateProfileCard(){const el=$('#profileCard');if(!el)return;el.innerHTML='<div class="pf-img" style="'+getBorderCSS(equippedBorder)+'"><img src="'+(skinURLs[currentSkin]||dogURL)+'"></div><div class="pf-info"><span class="pf-lv">Lv. '+stageProgress+'</span><span class="pf-name">'+(playerName||'???')+'</span></div>'}
-function goLobby(){sfx.click();['#shopPage','#equipPage','#battlePage','#settingsPage','#modeSelect'].forEach(id=>show(id,false));show('#lobby',true);$('#profileCard').style.display='flex';updateProfileCard()}
+const allScreens=['#lobby','#battlePage','#shopPage','#equipPage','#settingsPage','#modeSelect','#bpPage','#questPage','#end','#pause','#levelup'];
+function goPage(id){sfx.click();show('#lobby',false);show('#modeSelect',false);show('#'+id+'Page',true);$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';if(id==='battle'){buildStageMap();setTimeout(()=>scrollToStage(selectedStage),50)}else if(id==='equip')buildEquipPage();else if(id==='shop')buildShopPage()}
+function goModeSelect(){sfx.click();show('#lobby',false);show('#modeSelect',true);$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';const b=parseInt(localStorage.getItem('ccsg_infbest')||'0');$('#infiniteBest').textContent=b?'최고 기록: WAVE '+b:''}
+function updateProfileCard(){const el=$('#profileCard');if(!el)return;let ti=equippedTitle&&TITLES[equippedTitle]?'<span class="pf-title" style="color:'+TITLES[equippedTitle].color+'">'+TITLES[equippedTitle].name+'</span>':'';el.innerHTML='<div class="pf-img" style="'+getBorderCSS(equippedBorder)+'"><img src="'+(skinURLs[currentSkin]||dogURL)+'"></div><div class="pf-info"><span class="pf-lv">Lv. '+playerLevel+'</span><span class="pf-name">'+(playerName||'???')+'</span>'+ti+'</div>'}
+function goLobby(){sfx.click();['#shopPage','#equipPage','#battlePage','#settingsPage','#modeSelect','#bpPage','#questPage'].forEach(id=>show(id,false));show('#lobby',true);$('#profileCard').style.display='flex';$('#lobbyQuick').style.display='flex';updateProfileCard()}
 let lastInfinite=false;
-function start(){sfx.click();lastInfinite=false;newGame();allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block';$('#profileCard').style.display='none'}
-function startInfinite(){sfx.click();lastInfinite=true;newGame(true);allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block'}
+function start(){sfx.click();lastInfinite=false;newGame();allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block';$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';questTrack('play',1)}
+function startInfinite(){sfx.click();lastInfinite=true;newGame(true);allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block';questTrack('play',1)}
 function retry(){sfx.click();if(lastInfinite)newGame(true);else newGame();allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block'}
 function pause(){if(G&&G.state==='play'){G.state='pause';joy=null;show('#pause',true)}}
 function resume(){if(G&&G.state==='pause'){G.state='play';show('#pause',false)}}
-function home(){sfx.click();G=null;['#end','#pause','#levelup','#battlePage'].forEach(id=>show(id,false));show('#lobby',true);$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none'}
+function home(){sfx.click();G=null;['#end','#pause','#levelup','#battlePage'].forEach(id=>show(id,false));show('#lobby',true);$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none';$('#profileCard').style.display='flex';$('#lobbyQuick').style.display='flex';updateProfileCard()}
 function endGame(win){G.state='over';joy=null;$('#pauseBtn').style.display='none';
   if(G.infinite){sfx.lose();const best=parseInt(localStorage.getItem('ccsg_infbest')||'0');
     if(G.wave>best)localStorage.setItem('ccsg_infbest',String(G.wave));
+    const waveGold=G.wave*5,waveXp=G.wave*3;gold+=waveGold;saveGold();gainPlayerXp(waveXp);questTrack('wave',G.wave);
     $('#endTitle').textContent='WAVE '+G.wave+' 탈락!';$('#endDog').src=dogURL;$('#endDog').className='lose';
-    $('#endStats').innerHTML=`<b>무한 모드</b><br>도달 웨이브 <b>WAVE ${G.wave}</b><br>생존 시간 <b>${fmt(G.t)}</b><br>처치한 좀비 <b>${G.kills}</b><br>도달 레벨 <b>${G.lv}</b>${G.wave>best?'<br><b style="color:#e74c3c">🎉 신기록!</b>':''}`;
+    $('#endStats').innerHTML=`<b>무한 모드</b><br>도달 웨이브 <b>WAVE ${G.wave}</b><br>생존 시간 <b>${fmt(G.t)}</b><br>처치한 좀비 <b>${G.kills}</b><br>도달 레벨 <b>${G.lv}</b><br>보상 <b>+${waveGold}G · +${waveXp} XP</b>${G.wave>best?'<br><b style="color:#e74c3c">🎉 신기록!</b>':''}`;
     show('#end',true);return}
-  if(win){sfx.win();if(selectedStage>=stageProgress&&selectedStage<STAGES.length){stageProgress=selectedStage+1;localStorage.setItem('ccsg_stage',String(stageProgress));selectedStage=stageProgress}}else sfx.lose();
+  let stageGold=0,stageXp=0;
+  if(win){sfx.win();stageGold=selectedStage*15;stageXp=selectedStage*10;gold+=stageGold;saveGold();gainPlayerXp(stageXp);questTrack('stage',1);if(selectedStage>=stageProgress&&selectedStage<STAGES.length){stageProgress=selectedStage+1;localStorage.setItem('ccsg_stage',String(stageProgress));selectedStage=stageProgress}}else sfx.lose();
   $('#endTitle').textContent=win?'승리! 멍멍!':'끄앙... 쓰러졌다';$('#endDog').src=dogURL;$('#endDog').className=win?'':'lose';
   const sn=STAGES[Math.min(selectedStage,STAGES.length)-1].name;
-  $('#endStats').innerHTML=`<b>${sn}</b><br>생존 시간 <b>${fmt(G.t)}</b><br>처치한 좀비 <b>${G.kills}</b><br>도달 레벨 <b>${G.lv}</b>`;show('#end',true)}
+  $('#endStats').innerHTML=`<b>${sn}</b><br>생존 시간 <b>${fmt(G.t)}</b><br>처치한 좀비 <b>${G.kills}</b><br>도달 레벨 <b>${G.lv}</b>${win?'<br>보상 <b>+'+stageGold+'G · +'+stageXp+' XP</b>':''}`;show('#end',true)}
 $('#startBtn').onclick=start;$('#retryBtn').onclick=retry;$('#homeBtn').onclick=home;$('#quitBtn').onclick=home;
 $('#resumeBtn').onclick=resume;$('#pauseBtn').onclick=pause;
 addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'||e.code==='KeyP'){if(G&&G.state==='play')pause();else resume()}if(e.code==='KeyX')useUlt()});
 addEventListener('keyup',e=>{keys[e.code]=false});
-let _cheat='',_enterCnt=0;addEventListener('keydown',e=>{if(e.code==='Enter'){_enterCnt++;_cheat=''}else{if(e.key.length===1)_cheat+=e.key;if(_enterCnt>=2&&_cheat==='rladncks'){_enterCnt=0;_cheat='';gold=99999;saveGold();stageProgress=STAGES.length;localStorage.setItem('ccsg_stage',String(stageProgress));ownedSkins=SKINS.map(s=>s.id);saveSkins();ownedUlts=Object.keys(ULTIMATES);saveUlts();ownedCompanions=Object.keys(COMPANIONS);equippedCompanion='chanchan';saveCompanions();ownedBorders=BORDERS.map(b=>b.id);equippedBorder='legendary';saveBorders();alert('관리자 모드: 전체 해금 완료')}}});
+let _cheat='',_enterCnt=0;addEventListener('keydown',e=>{if(e.code==='Enter'){_enterCnt++;_cheat=''}else{if(e.key.length===1)_cheat+=e.key;if(_enterCnt>=2&&_cheat==='rladncks'){_enterCnt=0;_cheat='';gold=99999;saveGold();stageProgress=STAGES.length;localStorage.setItem('ccsg_stage',String(stageProgress));ownedSkins=SKINS.map(s=>s.id);saveSkins();ownedUlts=Object.keys(ULTIMATES);saveUlts();ownedCompanions=Object.keys(COMPANIONS);equippedCompanion='chanchan';saveCompanions();ownedBorders=BORDERS.map(b=>b.id).concat(Object.keys(BP_BORDERS));equippedBorder='bp_master';saveBorders();ownedTitles=Object.keys(TITLES);equippedTitle='s1master';saveTitles();playerLevel=10;playerXp=0;savePlayerLv();bpClaimed=BP_REWARDS.map(r=>r.lv+':'+r.type+':'+r.val);saveBP();alert('관리자 모드: 전체 해금 완료')}}});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;pause()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
 cv.addEventListener('pointerdown',e=>{if(!G||G.state!=='play')return;joy={id:e.pointerId,sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId)});
@@ -992,7 +1098,7 @@ const up=e=>{if(joy&&e.pointerId===joy.id)joy=null};cv.addEventListener('pointer
 let last=performance.now(),clock=0;
 function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;clock+=dt;if(G&&G.state==='play')update(dt);if(G&&G.state==='ult')updateUlt(dt);if(dog){try{if(G&&G.state==='ult')renderUlt(clock);else render(clock)}catch(err){console.error(err);if(G&&G.state==='ult'){G.ultState=null;G.state='play'}}}requestAnimationFrame(loop)}
 const fontReady=Promise.race([document.fonts.load('700 20px Gaegu'),new Promise(r=>setTimeout(r,2500))]).catch(()=>{});
-Promise.all([fontReady,loadDog(),loadAllSkins()]).then(()=>{buildSprites();$('#titleDog').src=dogURL;const b=$('#startBtn');b.disabled=false;b.textContent='게임 시작';updateProfileCard();requestAnimationFrame(loop);if(!playerName)promptNickname()});
+Promise.all([fontReady,loadDog(),loadAllSkins()]).then(()=>{buildSprites();$('#titleDog').src=dogURL;const b=$('#startBtn');b.disabled=false;b.textContent='게임 시작';initDaily();updateProfileCard();requestAnimationFrame(loop);if(!playerName)promptNickname()});
 </script>
 </body>
 </html>
