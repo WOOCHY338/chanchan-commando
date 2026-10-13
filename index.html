@@ -628,15 +628,15 @@ function render(now){
     ctx.globalAlpha=e.flash>0?.5:1;const sq=1+Math.sin(now*9+e.seed)*.05;
     drawSpr(ctx,e.spr[(fi+e.seed)%2],e.x,e.y,0,(e.boss?e.face:1)*(e.flash>0?1.12:1),sq*(e.flash>0?1.12:1));ctx.globalAlpha=1}
   // 주인공 강아지
-  ctx.fillStyle='rgba(0,0,0,.12)';ctx.beginPath();ctx.ellipse(P.x,P.y+28,22,7,0,0,TAU);ctx.fill();
-  if(!(P.inv>0&&Math.floor(now*20)%2)){const bob=P.moving?Math.abs(Math.sin(P.walk*10))*5:0,sq=P.moving?1+Math.sin(P.walk*20)*.03:1+Math.sin(now*3)*.02,s=66/dog.h;
-    ctx.save();ctx.translate(P.x,P.y-4-bob);ctx.rotate(P.moving?Math.sin(P.walk*10)*.06:0);ctx.scale(P.face*s,s*sq);ctx.drawImage(dog,-dog.w/2,-dog.h/2);ctx.restore()}
-  const hpw=46;ctx.fillStyle='#fff';ctx.fillRect(P.x-hpw/2,P.y+36,hpw,7);ctx.fillStyle='#e74c3c';ctx.fillRect(P.x-hpw/2,P.y+36,hpw*P.hp/P.maxHp,7);ctx.lineWidth=2;ctx.strokeStyle='#111';ctx.strokeRect(P.x-hpw/2,P.y+36,hpw,7);
   if(G.comp&&G.comp.alive){const C=G.comp;
     ctx.fillStyle='rgba(0,0,0,.08)';ctx.beginPath();ctx.ellipse(C.x,C.y+18,14,5,0,0,TAU);ctx.fill();
     if(!(C.inv>0&&Math.floor(now*20)%2)){const bob=C.moving?Math.abs(Math.sin(C.walk*10))*3:0,sq=C.moving?1+Math.sin(C.walk*20)*.03:1+Math.sin(now*3)*.02,s=40/dog.h;
       ctx.save();ctx.translate(C.x,C.y-3-bob);ctx.rotate(C.moving?Math.sin(C.walk*10)*.06:0);ctx.scale(C.face*s,s*sq);ctx.drawImage(dog,-dog.w/2,-dog.h/2);ctx.restore()}
     const chw=30;ctx.fillStyle='#fff';ctx.fillRect(C.x-chw/2,C.y+22,chw,5);ctx.fillStyle='#74b9ff';ctx.fillRect(C.x-chw/2,C.y+22,chw*C.hp/C.maxHp,5);ctx.lineWidth=1.5;ctx.strokeStyle='#111';ctx.strokeRect(C.x-chw/2,C.y+22,chw,5)}
+  ctx.fillStyle='rgba(0,0,0,.12)';ctx.beginPath();ctx.ellipse(P.x,P.y+28,22,7,0,0,TAU);ctx.fill();
+  if(!(P.inv>0&&Math.floor(now*20)%2)){const bob=P.moving?Math.abs(Math.sin(P.walk*10))*5:0,sq=P.moving?1+Math.sin(P.walk*20)*.03:1+Math.sin(now*3)*.02,s=66/dog.h;
+    ctx.save();ctx.translate(P.x,P.y-4-bob);ctx.rotate(P.moving?Math.sin(P.walk*10)*.06:0);ctx.scale(P.face*s,s*sq);ctx.drawImage(dog,-dog.w/2,-dog.h/2);ctx.restore()}
+  const hpw=46;ctx.fillStyle='#fff';ctx.fillRect(P.x-hpw/2,P.y+36,hpw,7);ctx.fillStyle='#e74c3c';ctx.fillRect(P.x-hpw/2,P.y+36,hpw*P.hp/P.maxHp,7);ctx.lineWidth=2;ctx.strokeStyle='#111';ctx.strokeRect(P.x-hpw/2,P.y+36,hpw,7);
   for(const w of G.weapons)if(w.balls){const spr=S.proj[w.id];for(const b of w.balls)drawSpr(ctx,spr,b[0],b[1],now*8,b[2]/13*.95,b[2]/13*.95)}
   if(G.comp&&G.comp.alive)for(const w of G.comp.weapons)if(w.balls){const spr=S.proj[w.id];for(const b of w.balls)drawSpr(ctx,spr,b[0],b[1],now*8,b[2]/13*.65,b[2]/13*.65)}
   for(const p of G.proj)if(vis(p.x,p.y,20))drawSpr(ctx,S.proj[p.spr],p.x,p.y,p.rot,p.r/13,p.r/13);
