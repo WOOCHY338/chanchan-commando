@@ -363,7 +363,7 @@ const ULTIMATES={
   jump:{name:'점프 타임',desc:'하늘 높이 점프 후 내리찍기! 범위 내 적 즉사',price:30,cd:50,pts:3,icon:'💥'},
   orbital:{name:'궤도 일격',desc:'하늘에서 궤도 레이저가 내려온다',price:80,cd:30,pts:4,icon:'☄️'},
 };
-const COMPANIONS={chanchan:{name:'기본 찬찬',desc:'메인 찬찬을 따라다니며 함께 싸운다 (능력치 -30%)',icon:'🐕'}};
+const COMPANIONS={chanchan:{name:'기본 찬찬',desc:'메인 찬찬을 따라다니며 함께 싸운다 (능력치 -30%)',icon:'🐕',price:500}};
 const ENEMY={zombie:{r:15,hp:10,spd:48,dmg:6,xp:1},runner:{r:12,hp:7,spd:85,dmg:5,xp:1},tank:{r:27,hp:60,spd:34,dmg:12,xp:5}};
 const BOSSES=[
   {t:90,name:'뚱냥이 대장',hp:1500,spr:'boss1',r:55,spd:55,dmg:12,fish:false},
@@ -870,13 +870,13 @@ function switchEquipTab(idx){
     if(eqInv.length===0)h+='<div class="equip-empty">판매할 장비가 없습니다</div>';
     else{h+='<div class="inv-grid">';eqInv.forEach((id,i)=>{const eq=EQUIPS[id];h+='<div class="inv-item" onclick="sellEquip('+i+')" style="border-color:#e67e22"><span>'+eq.icon+'</span><span class="eq-nm">'+eq.name+'</span><span class="eq-desc" style="color:#e67e22;font-weight:700">'+eq.sell+'G</span></div>'});h+='</div>'}
     el.innerHTML=h}
-  else if(idx===2){let h='<div class="equip-title">동료</div>';
+  else if(idx===2){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="equip-title">동료</div>';
     for(const id in COMPANIONS){const c=COMPANIONS[id],own=ownedCompanions.indexOf(id)>=0,sel=equippedCompanion===id;
       h+='<div style="border:4px solid '+(sel?'#4caf50':'#111')+';border-radius:16px;padding:14px;margin:8px 0;background:#fff;box-shadow:3px 4px 0 '+(sel?'#388e3c':'#111')+';display:flex;align-items:center;gap:14px">';
       h+='<span style="font-size:40px">'+c.icon+'</span><div style="flex:1"><div style="font-size:22px;font-weight:700">'+c.name+'</div><div style="font-size:15px;color:#666">'+c.desc+'</div></div>';
       if(sel)h+='<span style="font-size:16px;font-weight:700;color:#4caf50;padding:6px 14px;border:3px solid #4caf50;border-radius:10px">장착 중</span>';
       else if(own)h+='<button class="btn" style="font-size:18px;padding:4px 16px;min-width:0" onclick="equipComp(\''+id+'\')">장착</button>';
-      else h+='<span style="font-size:14px;color:#999">미보유</span>';
+      else h+='<button class="btn" style="font-size:16px;padding:4px 14px;min-width:0;background:'+(gold>=c.price?'#e67e22':'#aaa')+'" onclick="buyComp(\''+id+'\')"'+(gold<c.price?' disabled':'')+'>'+c.price+'G 구매</button>';
       h+='</div>'}
     if(equippedCompanion)h+='<button class="btn gray" style="margin-top:12px;font-size:18px" onclick="unequipComp()">동료 해제</button>';
     el.innerHTML=h}
@@ -884,6 +884,7 @@ function switchEquipTab(idx){
 function equipItem(i){if(eqEquipped.length>=MAX_EQ)return;sfx.click();eqEquipped.push(eqInv.splice(i,1)[0]);saveEquip();buildEquipPage()}
 function unequipItem(i){sfx.click();eqInv.push(eqEquipped.splice(i,1)[0]);saveEquip();buildEquipPage()}
 function sellEquip(i){sfx.click();const eq=EQUIPS[eqInv[i]];gold+=eq.sell;eqInv.splice(i,1);saveEquip();saveGold();switchEquipTab(1)}
+function buyComp(id){const c=COMPANIONS[id];if(gold<c.price)return;sfx.click();gold-=c.price;saveGold();ownedCompanions.push(id);equippedCompanion=id;saveCompanions();switchEquipTab(2)}
 function equipComp(id){sfx.click();equippedCompanion=id;saveCompanions();switchEquipTab(2)}
 function unequipComp(){sfx.click();equippedCompanion='';saveCompanions();switchEquipTab(2)}
 
