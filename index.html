@@ -100,7 +100,7 @@ canvas{display:block;position:fixed;inset:0}
 .mode-card .mode-desc{font-size:15px;color:#888;line-height:1.2}
 .mode-card.infinite .mode-desc{color:#aaa}
 .shop-tabs{display:flex;gap:0;width:100%;max-width:500px;border-bottom:4px solid #111}
-.shop-tab{flex:1;font-family:inherit;font-size:18px;font-weight:700;padding:10px 4px;background:#e4e1d6;border:none;cursor:pointer;color:#999;border-radius:12px 12px 0 0;transition:background .15s}
+.shop-tab{flex:1;font-family:inherit;font-size:16px;font-weight:700;padding:10px 2px;background:#e4e1d6;border:none;cursor:pointer;color:#999;border-radius:12px 12px 0 0;transition:background .15s}
 .shop-tab.active{background:#fff;color:#111;border:4px solid #111;border-bottom:4px solid #fff;margin-bottom:-4px;position:relative;z-index:1}
 .shop-tab.locked{opacity:.45;cursor:default}
 .shop-content{width:100%;max-width:500px;overflow-y:auto;flex:1;padding:12px 0}
@@ -143,7 +143,8 @@ canvas{display:block;position:fixed;inset:0}
     <button class="shop-tab locked" onclick="">장비</button>
     <button class="shop-tab" onclick="switchShopTab(1)">궁극기</button>
     <button class="shop-tab" onclick="switchShopTab(2)">동료</button>
-    <button class="shop-tab" onclick="switchShopTab(3)">스킨</button>
+    <button class="shop-tab" onclick="switchShopTab(3)">프로필</button>
+    <button class="shop-tab" onclick="switchShopTab(4)">스킨</button>
   </div>
   <div id="shopContent" class="shop-content"></div>
 </div>
@@ -364,6 +365,18 @@ const ULTIMATES={
   orbital:{name:'궤도 일격',desc:'하늘에서 궤도 레이저가 내려온다',price:80,cd:30,pts:4,icon:'☄️'},
 };
 const COMPANIONS={chanchan:{name:'기본 찬찬',desc:'메인 찬찬을 따라다니며 함께 싸운다 (능력치 -30%)',icon:'🐕',price:125}};
+const BORDERS=[
+{id:'none',name:'테두리 없음',price:0,style:'none'},
+{id:'blue',name:'파란 테두리',price:10,style:'4px solid #3498db'},
+{id:'red',name:'빨간 테두리',price:10,style:'4px solid #e74c3c'},
+{id:'rainbow',name:'무지개 테두리',price:25,style:'4px solid transparent',bg:'conic-gradient(#e74c3c,#f39c12,#f1c40f,#2ecc71,#3498db,#9b59b6,#e74c3c)'},
+{id:'gold',name:'골드 테두리',price:50,style:'5px solid #f1c40f',shadow:'0 0 12px #f39c12'},
+{id:'diamond',name:'다이아 테두리',price:100,style:'5px solid #74b9ff',shadow:'0 0 14px #74b9ff'},
+{id:'emerald',name:'에메랄드 테두리',price:150,style:'5px solid #00b894',shadow:'0 0 14px #00b894'},
+{id:'taegeuk',name:'태극 테두리',price:200,style:'5px solid transparent',bg:'linear-gradient(135deg,#c0392b 0%,#c0392b 50%,#2980b9 50%,#2980b9 100%)'},
+{id:'netherite',name:'네더라이트 테두리',price:300,style:'5px solid #4a4a4a',shadow:'0 0 16px #8e44ad',bg:'linear-gradient(135deg,#2c3e50,#4a4a4a,#2c3e50)'},
+{id:'legendary',name:'레전더리 찬찬 테두리',price:400,style:'5px solid transparent',bg:'linear-gradient(135deg,#f39c12,#e74c3c,#9b59b6,#3498db,#f39c12)',shadow:'0 0 20px #f39c12,0 0 40px #e74c3c'},
+];
 const ENEMY={zombie:{r:15,hp:10,spd:48,dmg:6,xp:1},runner:{r:12,hp:7,spd:85,dmg:5,xp:1},tank:{r:27,hp:60,spd:34,dmg:12,xp:5}};
 const BOSSES=[
   {t:90,name:'뚱냥이 대장',hp:1500,spr:'boss1',r:55,spd:55,dmg:12,fish:false},
@@ -442,6 +455,10 @@ function saveUlts(){localStorage.setItem('ccsg_ults',JSON.stringify(ownedUlts));
 let ownedCompanions=JSON.parse(localStorage.getItem('ccsg_comps')||'[]');
 let equippedCompanion=localStorage.getItem('ccsg_comp')||'';
 function saveCompanions(){localStorage.setItem('ccsg_comps',JSON.stringify(ownedCompanions));localStorage.setItem('ccsg_comp',equippedCompanion)}
+let playerName=localStorage.getItem('ccsg_name')||'';
+let ownedBorders=JSON.parse(localStorage.getItem('ccsg_borders')||'["none"]');
+let equippedBorder=localStorage.getItem('ccsg_border')||'none';
+function saveBorders(){localStorage.setItem('ccsg_borders',JSON.stringify(ownedBorders));localStorage.setItem('ccsg_border',equippedBorder)}
 function saveEquip(){localStorage.setItem('ccsg_inv',JSON.stringify(eqInv));localStorage.setItem('ccsg_equip',JSON.stringify(eqEquipped))}
 function newGame(inf){
   G={t:0,state:'play',kills:0,lv:1,xp:0,xpNeed:xpFor(1),pendingLv:0,
@@ -898,7 +915,15 @@ function switchShopTab(idx){
       let btn;if(sel)btn='장착 중';else if(own)btn='장착';else btn=u.price+'G';
       h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'equipUlt':'buyUlt')+'(\''+id+'\')"><div style="font-size:48px;padding:12px">'+u.icon+'</div><div class="sk-name">'+u.name+'</div><div style="font-size:13px;color:#666;padding:2px 6px">'+u.desc+'</div><div style="font-size:12px;color:#999;margin:2px 0">쿨타임 '+u.cd+'초 · 포인트 '+u.pts+'개</div><div class="sk-badge'+(sel?' on':'')+'">'+btn+'</div></div>'}
     h+='</div>';el.innerHTML=h}
-  else if(idx===3){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="skin-grid">';SKINS.forEach(s=>{if(!skinURLs[s.id])return;const sel=s.id===currentSkin,own=ownedSkins.indexOf(s.id)>=0;let btn;if(sel)btn='착용 중';else if(own)btn='착용';else btn=s.price+'G';h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'selectSkin':'buySkin')+'(\''+s.id+'\')"><img src="'+skinURLs[s.id]+'" class="skin-preview"><div class="skin-name">'+s.name+'</div><div class="skin-btn">'+btn+'</div></div>'});h+='</div>';el.innerHTML=h}
+  else if(idx===3){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div>';
+    h+='<div style="text-align:center;margin:12px 0"><div style="position:relative;display:inline-block;width:100px;height:100px;border-radius:50%;overflow:hidden;'+getBorderCSS(equippedBorder)+'"><img src="'+(skinURLs[currentSkin]||dogURL)+'" style="width:130%;height:auto;position:absolute;top:0;left:50%;transform:translateX(-50%)"></div>';
+    h+='<div style="font-size:22px;font-weight:700;margin-top:8px">'+(playerName||'???')+'</div></div>';
+    h+='<div class="equip-title">테두리</div><div class="skin-grid">';
+    BORDERS.forEach(b=>{const own=ownedBorders.indexOf(b.id)>=0,sel=equippedBorder===b.id;
+      let btn;if(sel)btn='장착 중';else if(own)btn='장착';else btn=b.price+'G';
+      h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'selectBorder':'buyBorder')+'(\''+b.id+'\')"><div style="width:60px;height:60px;border-radius:50%;'+getBorderCSS(b.id)+'background-color:#fbfaf3;margin:8px auto"></div><div class="sk-name" style="font-size:13px">'+b.name+'</div><div class="sk-badge'+(sel?' on':'')+'">'+btn+'</div></div>'});
+    h+='</div>';el.innerHTML=h}
+  else if(idx===4){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="skin-grid">';SKINS.forEach(s=>{if(!skinURLs[s.id])return;const sel=s.id===currentSkin,own=ownedSkins.indexOf(s.id)>=0;let btn;if(sel)btn='착용 중';else if(own)btn='착용';else btn=s.price+'G';h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'selectSkin':'buySkin')+'(\''+s.id+'\')"><img src="'+skinURLs[s.id]+'" class="skin-preview"><div class="skin-name">'+s.name+'</div><div class="skin-btn">'+btn+'</div></div>'});h+='</div>';el.innerHTML=h}
   else if(idx===2){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="equip-title">동료</div>';
     for(const id in COMPANIONS){const c=COMPANIONS[id],own=ownedCompanions.indexOf(id)>=0,sel=equippedCompanion===id;
       h+='<div style="border:4px solid '+(sel?'#4caf50':'#111')+';border-radius:16px;padding:14px;margin:8px 16px;background:#fff;box-shadow:3px 4px 0 '+(sel?'#388e3c':'#111')+';display:flex;align-items:center;gap:14px">';
@@ -912,9 +937,16 @@ function switchShopTab(idx){
   else el.innerHTML='<div style="text-align:center;padding:40px;color:#888;font-size:18px">준비 중입니다</div>';
 }
 function buySkin(id){const s=SKINS.find(sk=>sk.id===id);if(!s||gold<s.price)return;sfx.click();gold-=s.price;ownedSkins.push(id);saveGold();saveSkins();selectSkin(id)}
-function selectSkin(id){sfx.click();currentSkin=id;localStorage.setItem('ccsg_skin',id);loadDog().then(()=>{$('#titleDog').src=dogURL;switchShopTab(3)})}
+function selectSkin(id){sfx.click();currentSkin=id;localStorage.setItem('ccsg_skin',id);loadDog().then(()=>{$('#titleDog').src=dogURL;switchShopTab(4)})}
 function buyUlt(id){const u=ULTIMATES[id];if(!u||gold<u.price)return;sfx.click();gold-=u.price;ownedUlts.push(id);saveGold();saveUlts();equipUlt(id)}
 function equipUlt(id){sfx.click();equippedUlt=id;saveUlts();switchShopTab(1)}
+function getBorderCSS(id){const b=BORDERS.find(x=>x.id===id);if(!b||b.style==='none')return '';let s='border:'+b.style+';';if(b.bg)s+='background-image:'+b.bg+';background-origin:border-box;background-clip:border-box;';if(b.shadow)s+='box-shadow:'+b.shadow+';';return s}
+function buyBorder(id){const b=BORDERS.find(x=>x.id===id);if(!b||gold<b.price)return;sfx.click();gold-=b.price;ownedBorders.push(id);saveGold();saveBorders();selectBorder(id)}
+function selectBorder(id){sfx.click();equippedBorder=id;saveBorders();switchShopTab(3)}
+function promptNickname(){const d=document.createElement('div');d.id='nickModal';d.style.cssText='position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6)';
+  d.innerHTML='<div style="background:#fff;border:4px solid #111;border-radius:20px;padding:28px;max-width:340px;width:90%;text-align:center;box-shadow:6px 7px 0 #111"><div style="font-size:28px;font-weight:700;margin-bottom:6px">닉네임 설정</div><div style="font-size:16px;color:#e74c3c;margin-bottom:14px">한번 정하면 바꿀 수 없습니다!</div><input id="nickInput" style="font-family:inherit;font-size:22px;padding:8px 14px;border:3px solid #111;border-radius:10px;width:100%;text-align:center;box-sizing:border-box" maxlength="12" placeholder="닉네임 입력"><div style="margin-top:14px"><button class="btn" style="font-size:22px;min-width:120px" onclick="confirmNick()">확인</button></div></div>';
+  document.body.appendChild(d);setTimeout(()=>$('#nickInput').focus(),100)}
+function confirmNick(){const v=$('#nickInput').value.trim();if(!v)return;playerName=v;localStorage.setItem('ccsg_name',playerName);const m=$('#nickModal');if(m)m.remove()}
 
 const show=(id,on)=>$(id).classList.toggle('show',on);
 const allScreens=['#lobby','#battlePage','#shopPage','#equipPage','#settingsPage','#modeSelect','#end','#pause','#levelup'];
@@ -942,7 +974,7 @@ $('#startBtn').onclick=start;$('#retryBtn').onclick=retry;$('#homeBtn').onclick=
 $('#resumeBtn').onclick=resume;$('#pauseBtn').onclick=pause;
 addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'||e.code==='KeyP'){if(G&&G.state==='play')pause();else resume()}if(e.code==='KeyX')useUlt()});
 addEventListener('keyup',e=>{keys[e.code]=false});
-let _cheat='',_enterCnt=0;addEventListener('keydown',e=>{if(e.code==='Enter'){_enterCnt++;_cheat=''}else{if(e.key.length===1)_cheat+=e.key;if(_enterCnt>=2&&_cheat==='rladncks'){_enterCnt=0;_cheat='';gold=99999;saveGold();stageProgress=STAGES.length;localStorage.setItem('ccsg_stage',String(stageProgress));ownedSkins=SKINS.map(s=>s.id);saveSkins();ownedUlts=Object.keys(ULTIMATES);saveUlts();ownedCompanions=Object.keys(COMPANIONS);equippedCompanion='chanchan';saveCompanions();alert('관리자 모드: 전체 해금 완료')}}});
+let _cheat='',_enterCnt=0;addEventListener('keydown',e=>{if(e.code==='Enter'){_enterCnt++;_cheat=''}else{if(e.key.length===1)_cheat+=e.key;if(_enterCnt>=2&&_cheat==='rladncks'){_enterCnt=0;_cheat='';gold=99999;saveGold();stageProgress=STAGES.length;localStorage.setItem('ccsg_stage',String(stageProgress));ownedSkins=SKINS.map(s=>s.id);saveSkins();ownedUlts=Object.keys(ULTIMATES);saveUlts();ownedCompanions=Object.keys(COMPANIONS);equippedCompanion='chanchan';saveCompanions();ownedBorders=BORDERS.map(b=>b.id);equippedBorder='legendary';saveBorders();alert('관리자 모드: 전체 해금 완료')}}});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;pause()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
 cv.addEventListener('pointerdown',e=>{if(!G||G.state!=='play')return;joy={id:e.pointerId,sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId)});
@@ -952,7 +984,7 @@ const up=e=>{if(joy&&e.pointerId===joy.id)joy=null};cv.addEventListener('pointer
 let last=performance.now(),clock=0;
 function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;clock+=dt;if(G&&G.state==='play')update(dt);if(G&&G.state==='ult')updateUlt(dt);if(dog){try{if(G&&G.state==='ult')renderUlt(clock);else render(clock)}catch(err){console.error(err);if(G&&G.state==='ult'){G.ultState=null;G.state='play'}}}requestAnimationFrame(loop)}
 const fontReady=Promise.race([document.fonts.load('700 20px Gaegu'),new Promise(r=>setTimeout(r,2500))]).catch(()=>{});
-Promise.all([fontReady,loadDog(),loadAllSkins()]).then(()=>{buildSprites();$('#titleDog').src=dogURL;const b=$('#startBtn');b.disabled=false;b.textContent='게임 시작';requestAnimationFrame(loop)});
+Promise.all([fontReady,loadDog(),loadAllSkins()]).then(()=>{buildSprites();$('#titleDog').src=dogURL;const b=$('#startBtn');b.disabled=false;b.textContent='게임 시작';requestAnimationFrame(loop);if(!playerName)promptNickname()});
 </script>
 </body>
 </html>
