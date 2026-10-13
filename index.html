@@ -112,6 +112,12 @@ canvas{display:block;position:fixed;inset:0}
 .skin-card .sk-name{font-size:16px;font-weight:700;text-align:center}
 .skin-card .sk-badge{font-size:12px;font-weight:700;padding:1px 8px;border:2px solid #111;border-radius:6px;background:#ffe24a}
 .skin-card .sk-badge.on{background:#4caf50;color:#fff}
+#profileCard{position:fixed;top:12px;left:12px;z-index:11;display:flex;align-items:center;gap:10px;background:#fff;border:3px solid #111;border-radius:14px;padding:6px 14px 6px 6px;box-shadow:3px 4px 0 #111;cursor:pointer;max-width:calc(100vw - 24px)}
+#profileCard .pf-img{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#fbfaf3}
+#profileCard .pf-img img{width:130%;height:auto;display:block;margin:-2px auto 0;transform:translateX(-12%)}
+#profileCard .pf-info{display:flex;flex-direction:column;line-height:1.2}
+#profileCard .pf-lv{font-size:13px;color:#888;font-weight:700}
+#profileCard .pf-name{font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
 #ultBtn{position:fixed;bottom:28px;right:28px;z-index:5;width:72px;height:72px;border-radius:50%;border:4px solid #111;background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;display:none;box-shadow:3px 4px 0 #111;line-height:1.1;transition:opacity .2s}
 #ultBtn.ready{animation:ultglow 1s ease-in-out infinite alternate;border-color:#ffd23f}
 #ultBtn.cd{background:#555;opacity:.7}
@@ -125,6 +131,7 @@ canvas{display:block;position:fixed;inset:0}
 <button id="ultBtn" onclick="useUlt()">궁극기</button>
 
 <div id="lobby" class="overlay show">
+  <div id="profileCard" onclick="goPage('shop');switchShopTab(3)"></div>
   <div class="logo">찬찬특공개</div>
   <img id="titleDog" alt="">
   <p class="sub">좀비 고양이 왕을 물리쳐라!</p>
@@ -950,11 +957,12 @@ function confirmNick(){const v=$('#nickInput').value.trim();if(!v)return;playerN
 
 const show=(id,on)=>$(id).classList.toggle('show',on);
 const allScreens=['#lobby','#battlePage','#shopPage','#equipPage','#settingsPage','#modeSelect','#end','#pause','#levelup'];
-function goPage(id){sfx.click();show('#lobby',false);show('#modeSelect',false);show('#'+id+'Page',true);if(id==='battle'){buildStageMap();setTimeout(()=>scrollToStage(selectedStage),50)}else if(id==='equip')buildEquipPage();else if(id==='shop')buildShopPage()}
-function goModeSelect(){sfx.click();show('#lobby',false);show('#modeSelect',true);const b=parseInt(localStorage.getItem('ccsg_infbest')||'0');$('#infiniteBest').textContent=b?'최고 기록: WAVE '+b:''}
-function goLobby(){sfx.click();['#shopPage','#equipPage','#battlePage','#settingsPage','#modeSelect'].forEach(id=>show(id,false));show('#lobby',true)}
+function goPage(id){sfx.click();show('#lobby',false);show('#modeSelect',false);show('#'+id+'Page',true);$('#profileCard').style.display='none';if(id==='battle'){buildStageMap();setTimeout(()=>scrollToStage(selectedStage),50)}else if(id==='equip')buildEquipPage();else if(id==='shop')buildShopPage()}
+function goModeSelect(){sfx.click();show('#lobby',false);show('#modeSelect',true);$('#profileCard').style.display='none';const b=parseInt(localStorage.getItem('ccsg_infbest')||'0');$('#infiniteBest').textContent=b?'최고 기록: WAVE '+b:''}
+function updateProfileCard(){const el=$('#profileCard');if(!el)return;el.innerHTML='<div class="pf-img" style="'+getBorderCSS(equippedBorder)+'"><img src="'+(skinURLs[currentSkin]||dogURL)+'"></div><div class="pf-info"><span class="pf-lv">Lv. '+stageProgress+'</span><span class="pf-name">'+(playerName||'???')+'</span></div>'}
+function goLobby(){sfx.click();['#shopPage','#equipPage','#battlePage','#settingsPage','#modeSelect'].forEach(id=>show(id,false));show('#lobby',true);$('#profileCard').style.display='flex';updateProfileCard()}
 let lastInfinite=false;
-function start(){sfx.click();lastInfinite=false;newGame();allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block'}
+function start(){sfx.click();lastInfinite=false;newGame();allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block';$('#profileCard').style.display='none'}
 function startInfinite(){sfx.click();lastInfinite=true;newGame(true);allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block'}
 function retry(){sfx.click();if(lastInfinite)newGame(true);else newGame();allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block'}
 function pause(){if(G&&G.state==='play'){G.state='pause';joy=null;show('#pause',true)}}
@@ -984,7 +992,7 @@ const up=e=>{if(joy&&e.pointerId===joy.id)joy=null};cv.addEventListener('pointer
 let last=performance.now(),clock=0;
 function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;clock+=dt;if(G&&G.state==='play')update(dt);if(G&&G.state==='ult')updateUlt(dt);if(dog){try{if(G&&G.state==='ult')renderUlt(clock);else render(clock)}catch(err){console.error(err);if(G&&G.state==='ult'){G.ultState=null;G.state='play'}}}requestAnimationFrame(loop)}
 const fontReady=Promise.race([document.fonts.load('700 20px Gaegu'),new Promise(r=>setTimeout(r,2500))]).catch(()=>{});
-Promise.all([fontReady,loadDog(),loadAllSkins()]).then(()=>{buildSprites();$('#titleDog').src=dogURL;const b=$('#startBtn');b.disabled=false;b.textContent='게임 시작';requestAnimationFrame(loop);if(!playerName)promptNickname()});
+Promise.all([fontReady,loadDog(),loadAllSkins()]).then(()=>{buildSprites();$('#titleDog').src=dogURL;const b=$('#startBtn');b.disabled=false;b.textContent='게임 시작';updateProfileCard();requestAnimationFrame(loop);if(!playerName)promptNickname()});
 </script>
 </body>
 </html>
