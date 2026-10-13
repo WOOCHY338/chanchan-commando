@@ -142,7 +142,7 @@ canvas{display:block;position:fixed;inset:0}
   <div class="shop-tabs">
     <button class="shop-tab locked" onclick="">장비</button>
     <button class="shop-tab" onclick="switchShopTab(1)">궁극기</button>
-    <button class="shop-tab locked" onclick="">프로필</button>
+    <button class="shop-tab" onclick="switchShopTab(2)">동료</button>
     <button class="shop-tab" onclick="switchShopTab(3)">스킨</button>
   </div>
   <div id="shopContent" class="shop-content"></div>
@@ -363,7 +363,7 @@ const ULTIMATES={
   jump:{name:'점프 타임',desc:'하늘 높이 점프 후 내리찍기! 범위 내 적 즉사',price:30,cd:50,pts:3,icon:'💥'},
   orbital:{name:'궤도 일격',desc:'하늘에서 궤도 레이저가 내려온다',price:80,cd:30,pts:4,icon:'☄️'},
 };
-const COMPANIONS={chanchan:{name:'기본 찬찬',desc:'메인 찬찬을 따라다니며 함께 싸운다 (능력치 -30%)',icon:'🐕',price:500}};
+const COMPANIONS={chanchan:{name:'기본 찬찬',desc:'메인 찬찬을 따라다니며 함께 싸운다 (능력치 -30%)',icon:'🐕',price:125}};
 const ENEMY={zombie:{r:15,hp:10,spd:48,dmg:6,xp:1},runner:{r:12,hp:7,spd:85,dmg:5,xp:1},tank:{r:27,hp:60,spd:34,dmg:12,xp:5}};
 const BOSSES=[
   {t:90,name:'뚱냥이 대장',hp:1500,spr:'boss1',r:55,spd:55,dmg:12,fish:false},
@@ -575,12 +575,11 @@ function update(dt){
     if(d2<m*m&&d2>.01){const d=Math.sqrt(d2),f=(m-d)/d*.3;e.x+=dx*f;e.y+=dy*f}})}
   query(P.x,P.y,P.r,e=>{if((e.x-P.x)**2+(e.y-P.y)**2<(e.r+P.r-8)**2)hurt(e.dmg)});
   for(const w of G.weapons)WUP[w.id](w,dt);
-  if(G.comp&&G.comp.alive){const C=G.comp,tx=P.x-50*P.face,ty=P.y+28,tdx=tx-C.x,tdy=ty-C.y,td=Math.hypot(tdx,tdy);
-    if(td>5){const cs=Math.min(td,P.speed*G.stats.spd*.9*dt);C.x+=tdx/td*cs;C.y+=tdy/td*cs;C.moving=true;C.walk+=dt}else C.moving=false;
-    if(Math.abs(tdx)>1)C.face=tdx>0?1:-1;C.inv-=dt;
-    for(let i=C.weapons.length;i<G.weapons.length;i++)C.weapons.push({id:G.weapons[i].id,lv:G.weapons[i].lv,t:rnd(.2,.6)});
-    for(let i=0;i<Math.min(C.weapons.length,G.weapons.length);i++){C.weapons[i].id=G.weapons[i].id;C.weapons[i].lv=G.weapons[i].lv}
-    C.weapons.length=G.weapons.length;
+  if(G.comp&&G.comp.alive){const C=G.comp,dx0=P.x-C.x,dy0=P.y-C.y,dist=Math.hypot(dx0,dy0);
+    if(dist>60){const tx=P.x-50*P.face,ty=P.y+28,tdx=tx-C.x,tdy=ty-C.y,td=Math.hypot(tdx,tdy);
+      const cs=Math.min(td,P.speed*G.stats.spd*.9*dt);C.x+=tdx/td*cs;C.y+=tdy/td*cs;C.moving=true;C.walk+=dt;if(Math.abs(tdx)>1)C.face=tdx>0?1:-1}else{C.moving=false;if(Math.abs(dx0)>1)C.face=dx0>0?-1:1}
+    C.inv-=dt;
+    C.weapons=[{id:'bone',lv:G.weapons[0]?G.weapons[0].lv:1,t:C.weapons[0]?C.weapons[0].t:0}];
     const ox=P.x,oy=P.y,of=P.face,od=G.stats.dmg,oa=G.stats.area,oc=G.stats.cd;
     P.x=C.x;P.y=C.y;P.face=C.face;G.stats.dmg*=.7;G.stats.area*=.7;
     for(const w of C.weapons)WUP[w.id](w,dt);
@@ -892,7 +891,7 @@ let shopTab=3;
 function buildShopPage(){switchShopTab(shopTab)}
 function switchShopTab(idx){
   shopTab=idx;
-  document.querySelectorAll('.shop-tab').forEach((t,i)=>{t.classList.toggle('active',i===idx)});
+  document.querySelectorAll('#shopPage .shop-tab').forEach((t,i)=>{t.classList.toggle('active',i===idx)});
   const el=$('#shopContent');if(!el)return;
   if(idx===1){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="skin-grid">';
     for(const id in ULTIMATES){const u=ULTIMATES[id],own=ownedUlts.indexOf(id)>=0,sel=equippedUlt===id;
@@ -900,6 +899,16 @@ function switchShopTab(idx){
       h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'equipUlt':'buyUlt')+'(\''+id+'\')"><div style="font-size:48px;padding:12px">'+u.icon+'</div><div class="sk-name">'+u.name+'</div><div style="font-size:13px;color:#666;padding:2px 6px">'+u.desc+'</div><div style="font-size:12px;color:#999;margin:2px 0">쿨타임 '+u.cd+'초 · 포인트 '+u.pts+'개</div><div class="sk-badge'+(sel?' on':'')+'">'+btn+'</div></div>'}
     h+='</div>';el.innerHTML=h}
   else if(idx===3){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="skin-grid">';SKINS.forEach(s=>{if(!skinURLs[s.id])return;const sel=s.id===currentSkin,own=ownedSkins.indexOf(s.id)>=0;let btn;if(sel)btn='착용 중';else if(own)btn='착용';else btn=s.price+'G';h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'selectSkin':'buySkin')+'(\''+s.id+'\')"><img src="'+skinURLs[s.id]+'" class="skin-preview"><div class="skin-name">'+s.name+'</div><div class="skin-btn">'+btn+'</div></div>'});h+='</div>';el.innerHTML=h}
+  else if(idx===2){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="equip-title">동료</div>';
+    for(const id in COMPANIONS){const c=COMPANIONS[id],own=ownedCompanions.indexOf(id)>=0,sel=equippedCompanion===id;
+      h+='<div style="border:4px solid '+(sel?'#4caf50':'#111')+';border-radius:16px;padding:14px;margin:8px 16px;background:#fff;box-shadow:3px 4px 0 '+(sel?'#388e3c':'#111')+';display:flex;align-items:center;gap:14px">';
+      h+='<span style="font-size:40px">'+c.icon+'</span><div style="flex:1"><div style="font-size:22px;font-weight:700">'+c.name+'</div><div style="font-size:15px;color:#666">'+c.desc+'</div></div>';
+      if(sel)h+='<span style="font-size:16px;font-weight:700;color:#4caf50;padding:6px 14px;border:3px solid #4caf50;border-radius:10px">장착 중</span>';
+      else if(own)h+='<button class="btn" style="font-size:18px;padding:4px 16px;min-width:0" onclick="equipComp(\''+id+'\');switchShopTab(2)">장착</button>';
+      else h+='<button class="btn" style="font-size:16px;padding:4px 14px;min-width:0;background:'+(gold>=c.price?'#e67e22':'#aaa')+'" onclick="buyComp(\''+id+'\')"'+(gold<c.price?' disabled':'')+'>'+c.price+'G 구매</button>';
+      h+='</div>'}
+    if(equippedCompanion)h+='<div style="text-align:center"><button class="btn gray" style="margin-top:12px;font-size:18px" onclick="unequipComp();switchShopTab(2)">동료 해제</button></div>';
+    el.innerHTML=h}
   else el.innerHTML='<div style="text-align:center;padding:40px;color:#888;font-size:18px">준비 중입니다</div>';
 }
 function buySkin(id){const s=SKINS.find(sk=>sk.id===id);if(!s||gold<s.price)return;sfx.click();gold-=s.price;ownedSkins.push(id);saveGold();saveSkins();selectSkin(id)}
