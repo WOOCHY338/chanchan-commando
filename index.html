@@ -896,6 +896,7 @@ $('#startBtn').onclick=start;$('#retryBtn').onclick=retry;$('#homeBtn').onclick=
 $('#resumeBtn').onclick=resume;$('#pauseBtn').onclick=pause;
 addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'||e.code==='KeyP'){if(G&&G.state==='play')pause();else resume()}if(e.code==='KeyX')useUlt()});
 addEventListener('keyup',e=>{keys[e.code]=false});
+let _cheat='',_enterCnt=0;addEventListener('keydown',e=>{if(e.code==='Enter'){_enterCnt++;_cheat=''}else{if(e.key.length===1)_cheat+=e.key;if(_enterCnt>=2&&_cheat==='rladncks'){_enterCnt=0;_cheat='';gold=99999;saveGold();stageProgress=STAGES.length;localStorage.setItem('ccsg_stage',String(stageProgress));ownedSkins=SKINS.map(s=>s.id);saveSkins();ownedUlts=Object.keys(ULTIMATES);saveUlts();alert('관리자 모드: 전체 해금 완료')}}});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;pause()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
 cv.addEventListener('pointerdown',e=>{if(!G||G.state!=='play')return;joy={id:e.pointerId,sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId)});
