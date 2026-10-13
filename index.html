@@ -575,7 +575,7 @@ function update(dt){
     if(d2<m*m&&d2>.01){const d=Math.sqrt(d2),f=(m-d)/d*.3;e.x+=dx*f;e.y+=dy*f}})}
   query(P.x,P.y,P.r,e=>{if((e.x-P.x)**2+(e.y-P.y)**2<(e.r+P.r-8)**2)hurt(e.dmg)});
   for(const w of G.weapons)WUP[w.id](w,dt);
-  if(G.comp&&G.comp.alive){const C=G.comp,tx=P.x-30*P.face,ty=P.y+18,tdx=tx-C.x,tdy=ty-C.y,td=Math.hypot(tdx,tdy);
+  if(G.comp&&G.comp.alive){const C=G.comp,tx=P.x-50*P.face,ty=P.y+28,tdx=tx-C.x,tdy=ty-C.y,td=Math.hypot(tdx,tdy);
     if(td>5){const cs=Math.min(td,P.speed*G.stats.spd*.9*dt);C.x+=tdx/td*cs;C.y+=tdy/td*cs;C.moving=true;C.walk+=dt}else C.moving=false;
     if(Math.abs(tdx)>1)C.face=tdx>0?1:-1;C.inv-=dt;
     for(let i=C.weapons.length;i<G.weapons.length;i++)C.weapons.push({id:G.weapons[i].id,lv:G.weapons[i].lv,t:rnd(.2,.6)});
