@@ -149,6 +149,7 @@ canvas{display:block;position:fixed;inset:0}
 @keyframes ultglow{from{box-shadow:3px 4px 0 #111,0 0 8px #ffd23f}to{box-shadow:3px 4px 0 #111,0 0 20px #ffd23f}}
 #ultBtn:active{transform:translate(2px,3px);box-shadow:1px 1px 0 #111}
 .mp-row{display:flex;gap:10px;align-items:center;justify-content:center}#mpCode{font-family:inherit;font-size:26px;width:150px;padding:6px;border:4px solid #111;border-radius:12px;text-align:center;-webkit-user-select:text;user-select:text}.mp-code{font-size:26px;text-align:center}.mp-code b{font-size:44px;color:#c0392b;letter-spacing:6px}.mp-list{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:22px;margin-top:6px}.mp-list span{background:#fff;border:3px solid #111;border-radius:10px;padding:2px 10px}
+#chatBtn{position:fixed;top:36px;left:12px;z-index:5;width:42px;height:42px;border:3px solid #111;border-radius:10px;background:#fff;font-size:20px;display:none;box-shadow:2px 3px 0 #111;cursor:pointer}#chatBar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:12;display:none;flex-wrap:wrap;gap:6px;align-items:center;background:#fff;border:3px solid #111;border-radius:14px;padding:8px;box-shadow:3px 4px 0 #111;width:min(520px,calc(100vw - 24px))}#chatBar.show{display:flex}#chatIn,#mpChatIn{font-family:inherit;font-size:20px;flex:1;min-width:0;padding:4px 10px;border:3px solid #111;border-radius:10px;-webkit-user-select:text;user-select:text}.cq{display:flex;gap:6px;width:100%;flex-wrap:wrap}.cq button,#chatBar>button{font-family:inherit;font-size:17px;font-weight:700;border:2px solid #111;border-radius:8px;background:#ffe24a;padding:2px 8px;cursor:pointer}.mp-chat{height:120px;overflow-y:auto;background:#fff;border:3px solid #111;border-radius:12px;padding:6px 10px;font-size:18px;text-align:left;-webkit-user-select:text;user-select:text}
 </style>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
@@ -156,6 +157,8 @@ canvas{display:block;position:fixed;inset:0}
 <canvas id="game"></canvas>
 <button id="pauseBtn" class="btn">II</button>
 <button id="ultBtn" onclick="useUlt()">궁극기</button>
+<button id="chatBtn" onclick="chatOpen()">💬</button>
+<div id="chatBar"><div class="cq"><button onclick="chatSend('살려줘!')">살려줘!</button><button onclick="chatSend('이쪽으로!')">이쪽으로!</button><button onclick="chatSend('보스 온다!')">보스 온다!</button><button onclick="chatSend('고마워!')">고마워!</button><button onclick="chatSend('ㅋㅋㅋㅋ')">ㅋㅋㅋ</button></div><input id="chatIn" maxlength="40" placeholder="메시지 입력"><button onclick="chatSend()">전송</button><button onclick="chatClose()">✕</button></div>
 
 <div id="lobby" class="overlay show">
   <div id="profileCard" onclick="goPage('shop');switchShopTab(3)"></div>
@@ -239,6 +242,7 @@ canvas{display:block;position:fixed;inset:0}
   <div id="mpRoom"></div>
   <button class="btn" id="mpStartBtn" style="display:none" onclick="mpStart()">게임 시작!</button>
   <p id="mpStatus" class="hint"></p>
+  <div id="mpChatWrap" style="display:none;width:100%;max-width:420px"><div id="mpChat" class="mp-chat"></div><div class="mp-row" style="margin-top:6px"><input id="mpChatIn" maxlength="40" placeholder="채팅 입력"><button class="btn gray" style="min-width:0;font-size:20px" onclick="chatSend(null,true)">전송</button></div></div>
 </div>
 
 <div id="battlePage" class="subpage">
@@ -1121,7 +1125,7 @@ function retry(){sfx.click();if(lastInfinite)newGame(true);else newGame();allScr
 function pause(){if(M)return;if(G&&G.state==='play'){G.state='pause';joy=null;show('#pause',true)}}
 function resume(){if(G&&G.state==='pause'){G.state='play';show('#pause',false)}}
 function home(){sfx.click();if(M){G=null;['#end','#pause','#levelup'].forEach(id=>show(id,false));$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none';show('#mpPage',true);mpLobbyUI();return}G=null;['#end','#pause','#levelup','#battlePage'].forEach(id=>show(id,false));show('#lobby',true);$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none';$('#profileCard').style.display='flex';$('#lobbyQuick').style.display='flex';updateProfileCard()}
-function endGame(win){G.state='over';joy=null;$('#pauseBtn').style.display='none';$('#retryBtn').style.display=M?'none':'';$('#levelup').classList.remove('show');
+function endGame(win){G.state='over';joy=null;$('#pauseBtn').style.display='none';$('#retryBtn').style.display=M?'none':'';$('#chatBtn').style.display='none';chatClose();$('#levelup').classList.remove('show');
   if(G.infinite){sfx.lose();const best=parseInt(localStorage.getItem('ccsg_infbest')||'0');
     if(G.wave>best)localStorage.setItem('ccsg_infbest',String(G.wave));
     const waveGold=G.wave*5,waveXp=G.wave*3;gold+=waveGold;saveGold();gainPlayerXp(waveXp);questTrack('wave',G.wave);
@@ -1135,7 +1139,7 @@ function endGame(win){G.state='over';joy=null;$('#pauseBtn').style.display='none
   $('#endStats').innerHTML=`<b>${sn}</b><br>생존 시간 <b>${fmt(G.t)}</b><br>처치한 좀비 <b>${G.kills}</b><br>도달 레벨 <b>${G.lv}</b>${win?'<br>보상 <b>+'+stageGold+'G · +'+stageXp+' XP</b>':''}`;show('#end',true)}
 $('#startBtn').onclick=start;$('#retryBtn').onclick=retry;$('#homeBtn').onclick=home;$('#quitBtn').onclick=home;
 $('#resumeBtn').onclick=resume;$('#pauseBtn').onclick=pause;
-addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'||e.code==='KeyP'){if(G&&G.state==='play')pause();else resume()}if(e.code==='KeyX')useUlt()});
+addEventListener('keydown',e=>{if(e.code==='Enter'&&e.target.tagName==='BUTTON'){e.preventDefault();e.target.blur()}if(e.target.tagName==='INPUT'){if(e.code==='Enter'&&e.target.id==='chatIn')chatSend();if(e.code==='Enter'&&e.target.id==='mpChatIn')chatSend(null,true);if(e.code==='Escape'&&e.target.id==='chatIn')chatClose();return}if(e.code==='Enter'&&M&&G&&G.state==='play'){chatOpen();return}keys[e.code]=true;if(e.code==='Escape'||e.code==='KeyP'){if(G&&G.state==='play')pause();else resume()}if(e.code==='KeyX')useUlt()});
 addEventListener('keyup',e=>{keys[e.code]=false});
 let _cheat='',_enterCnt=0;addEventListener('keydown',e=>{if(e.code==='Enter'){_enterCnt++;_cheat=''}else{if(e.key.length===1)_cheat+=e.key;if(_enterCnt>=2&&_cheat==='rladncks'){_enterCnt=0;_cheat='';gold=99999;saveGold();stageProgress=STAGES.length;localStorage.setItem('ccsg_stage',String(stageProgress));ownedSkins=SKINS.map(s=>s.id);saveSkins();ownedUlts=Object.keys(ULTIMATES);saveUlts();ownedCompanions=Object.keys(COMPANIONS);equippedCompanion='chanchan';saveCompanions();ownedBorders=BORDERS.map(b=>b.id).concat(Object.keys(BP_BORDERS));equippedBorder='bp_master';saveBorders();ownedTitles=Object.keys(TITLES);equippedTitle='s1master';saveTitles();playerLevel=10;playerXp=0;savePlayerLv();bpClaimed=BP_REWARDS.map(r=>r.lv+':'+r.type+':'+r.val);saveBP();alert('관리자 모드: 전체 해금 완료')}}});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;pause()});
@@ -1151,9 +1155,9 @@ function mpSend(o){if(!M)return;if(M.host){for(const c of M.conns)if(c.open&&c.p
 function mpStatus(s){$('#mpStatus').textContent=s}
 function mpMe(){return{name:playerName||'찬찬',skin:currentSkin}}
 function mpOpen(){sfx.click();show('#modeSelect',false);show('#mpPage',true);mpLobbyUI()}
-function mpLeave(){if(M){try{M.peer.destroy()}catch(e){}}M=null}
+function mpLeave(){if(M){try{M.peer.destroy()}catch(e){}}M=null;$('#mpChat').innerHTML=''}
 function mpBack(){mpLeave();show('#mpPage',false);mpStatus('');goModeSelect()}
-function mpLobbyUI(){const el=$('#mpRoom');if(!M){el.innerHTML='';$('#mpStartBtn').style.display='none';return}
+function mpLobbyUI(){const el=$('#mpRoom');$('#mpChatWrap').style.display=M?'':'none';if(!M){el.innerHTML='';$('#mpStartBtn').style.display='none';return}
   const names=M.host?Object.values(M.pl).map(p=>p.name):(M.lobby||[]);
   el.innerHTML=(M.host?'<div class="mp-code">방 코드 <b>'+(M.peer.open?M.code:'...')+'</b></div>':'')+'<div class="mp-list">'+names.map((n,i)=>'<span>'+(i?'🐶 ':'👑 ')+n+'</span>').join('')+'</div>';
   $('#mpStartBtn').style.display=M.host?'':'none'}
@@ -1172,6 +1176,7 @@ function mpHostRecv(c,d){
   if(d.k==='j'){if(Object.keys(M.pl).length>=4||(G&&G.state!=='over')){c.send({k:'full'});return}
     c.pid=c.peer;M.pl[c.pid]={name:d.name,skin:d.skin};c.send({k:'hi',id:c.pid});mpLobbyUI();mpSend({k:'lb',pl:Object.values(M.pl).map(p=>p.name)})}
   else if(d.k==='s'){const p=M.pl[c.pid];if(p)p.p=d.p}
+  else if(d.k==='c'&&c.pid){d.id=c.pid;d.t=String(d.t).slice(0,40);chatRecv(d);mpSend(d)}
   else if(d.k==='d'&&G&&G.state!=='over'){for(const [id,dm,kx,ky] of d.l){const e=M.ents.get(id);if(e&&!e.dead){M.lh=c.pid;hit(e,dm,kx,ky,true);M.lh=null}}}}
 function mpJoin(){sfx.click();const code=$('#mpCode').value.trim();if(!/^\d{4}$/.test(code)){mpStatus('4자리 코드를 입력하세요');return}
   if(!window.Peer){mpStatus('네트워크 로딩 실패 (인터넷 확인)');return}mpLeave();
@@ -1188,10 +1193,11 @@ function mpClientRecv(d){
   else if(d.k==='go')mpStartLocal();
   else if(d.k==='n'&&G&&G.state!=='over')mpApply(d);
   else if(d.k==='f'&&G){for(let i=0;i<12;i++){const a=d.o+i*TAU/12;G.eproj.push({x:d.x,y:d.y,vx:Math.cos(a)*150,vy:Math.sin(a)*150,a,r:9,dmg:8,life:5})}}
-  else if(d.k==='o'&&G&&G.state!=='over')endGame(false)}
+  else if(d.k==='o'&&G&&G.state!=='over')endGame(false);
+  else if(d.k==='c'&&d.id!==M.id)chatRecv(d)}
 function mpStart(){if(!M||!M.host)return;sfx.click();for(const id in M.pl)M.pl[id].p=null;M.kc={};M.dd=[];mpSend({k:'go'});mpStartLocal()}
 function mpStartLocal(){lastInfinite=true;newGame(true);G.multi=true;P.dead=false;M.rev=0;M.st=0;M.ents=new Map();M.others=[];if(!M.host){M.killed=new Set();M.dq=[]}
-  allScreens.concat('#mpPage').forEach(id=>show(id,false));$('#pauseBtn').style.display='none';questTrack('play',1)}
+  allScreens.concat('#mpPage').forEach(id=>show(id,false));$('#pauseBtn').style.display='none';$('#chatBtn').style.display='block';questTrack('play',1)}
 function mpObj(id,a){return{id,x:a[0],y:a[1],hp:a[2],maxHp:a[3],face:a[4],moving:a[5],alive:a[6],cx:a[7],cy:a[8],kills:a[9]||0,name:a[10],skin:a[11]}}
 function mpNear(e){let b=P,bd=P.dead?1e18:(P.x-e.x)**2+(P.y-e.y)**2;for(const o of M.others)if(o.alive){const d=(o.x-e.x)**2+(o.y-e.y)**2;if(d<bd){bd=d;b=o}}return b}
 function mpRandP(){const a=M.others.filter(o=>o.alive);if(!P.dead)a.push(P);return a.length?a[(Math.random()*a.length)|0]:P}
@@ -1235,14 +1241,24 @@ function mpDraw(now){for(const o of M.others){const im=skinCv[o.skin]||dog,s=60/
   if(o.cx!=null){const s2=36/im.height;ctx.save();ctx.translate(o.cx,o.cy);ctx.scale(o.face*s2,s2);ctx.drawImage(im,-im.width/2,-im.height/2);ctx.restore()}
   ctx.globalAlpha=o.alive?1:.35;const bob=o.moving?Math.abs(Math.sin(now*10))*4:0;ctx.save();ctx.translate(o.x,o.y-4-bob);ctx.scale(o.face*s,s);ctx.drawImage(im,-im.width/2,-im.height/2);ctx.restore();ctx.globalAlpha=1;
   const w=42;ctx.fillStyle='#fff';ctx.fillRect(o.x-w/2,o.y+34,w,6);ctx.fillStyle='#2ecc71';ctx.fillRect(o.x-w/2,o.y+34,w*Math.max(0,o.hp)/o.maxHp,6);ctx.lineWidth=2;ctx.strokeStyle='#111';ctx.strokeRect(o.x-w/2,o.y+34,w,6);
-  txt(o.alive?o.name:o.name+' 💀',o.x,o.y-46,16,'center',o.alive?'#2d6cdf':'#888')}}
+  txt(o.alive?o.name:o.name+' 💀',o.x,o.y-46,16,'center',o.alive?'#2d6cdf':'#888');const sy=chatSay(o.id);if(sy)txt(sy,o.x,o.y-70,20,'center')}
+  const ms=chatSay(M.host?'h':M.id);if(ms)txt(ms,P.x,P.y-74,20,'center')}
 function mpHud(){ctx.setTransform(DPR,0,0,DPR,0,0);
   for(const o of M.others){let sx=W/2+(o.x-P.x)*ZOOM,sy=H/2+(o.y-P.y)*ZOOM;if(sx>20&&sx<W-20&&sy>20&&sy<H-20)continue;sx=clamp(sx,40,W-40);sy=clamp(sy,190,H-30);
     fs(ctx,blobP(sx,sy,10,10,.05),o.alive?'#2ecc71':'#aaa',2.5);txt(o.name,sx,sy-18,14,'center')}
   txt('👥 '+(1+M.others.length)+'명',W-14,84,16,'right','#2d6cdf');
+  if(M.log){const l=M.log.filter(m=>clock-m.at<8).slice(-4);l.forEach((m,i)=>txt(m.n+': '+m.t,14,H-44-(l.length-1-i)*22,16,'left','#2d6cdf'))}
   if(P.dead)txt('쓰러짐! 동료가 옆에 오면 부활 '+Math.floor(M.rev/3*100)+'%',W/2,H*.75,24,'center','#c0392b')}
 function mpResult(){const l=[{name:playerName||'나',kills:G.kills}].concat(M.others).sort((a,b)=>b.kills-a.kills);
   return '<br><b>👥 팀 기록</b><br>'+l.map((p,i)=>(i?'':'🏆 ')+p.name+' <b>'+p.kills+'</b>킬').join('<br>')}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+function chatOpen(){$('#chatBar').classList.add('show');setTimeout(()=>$('#chatIn').focus(),50)}
+function chatClose(){$('#chatBar').classList.remove('show');$('#chatIn').blur()}
+function chatSend(t,lobby){const el=lobby?$('#mpChatIn'):$('#chatIn');t=String(t||el.value).trim().slice(0,40);if(!t||!M)return;el.value='';
+  const d={k:'c',id:M.host?'h':M.id,n:playerName||'찬찬',t};chatRecv(d);mpSend(d);if(!lobby)chatClose()}
+function chatRecv(d){M.log=(M.log||[]).concat({id:d.id,n:d.n,t:d.t,at:clock}).slice(-30);sfx.click();
+  const el=$('#mpChat');el.innerHTML=M.log.map(m=>'<div><b>'+esc(m.n)+'</b> '+esc(m.t)+'</div>').join('');el.scrollTop=1e9}
+function chatSay(id){if(!M||!M.log)return null;for(let i=M.log.length-1;i>=0;i--){const m=M.log[i];if(clock-m.at>4)return null;if(m.id===id)return m.t}return null}
 const fontReady=Promise.race([document.fonts.load('700 20px Gaegu'),new Promise(r=>setTimeout(r,2500))]).catch(()=>{});
 Promise.all([fontReady,loadDog(),loadAllSkins()]).then(()=>{buildSprites();$('#titleDog').src=dogURL;const b=$('#startBtn');b.disabled=false;b.textContent='게임 시작';initDaily();updateProfileCard();requestAnimationFrame(loop);if(!playerName)promptNickname()});
 </script>
