@@ -148,7 +148,7 @@ canvas{display:block;position:fixed;inset:0}
 #ultBtn.cd{background:#555;opacity:.7}
 @keyframes ultglow{from{box-shadow:3px 4px 0 #111,0 0 8px #ffd23f}to{box-shadow:3px 4px 0 #111,0 0 20px #ffd23f}}
 #ultBtn:active{transform:translate(2px,3px);box-shadow:1px 1px 0 #111}
-.mp-row{display:flex;gap:10px;align-items:center;justify-content:center}#mpCode{font-family:inherit;font-size:26px;width:150px;padding:6px;border:4px solid #111;border-radius:12px;text-align:center;-webkit-user-select:text;user-select:text}.mp-code{font-size:26px;text-align:center}.mp-code b{font-size:44px;color:#c0392b;letter-spacing:6px}.mp-list{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:22px;margin-top:6px}.mp-list span{background:#fff;border:3px solid #111;border-radius:10px;padding:2px 10px}
+.mp-row{display:flex;gap:10px;align-items:center;justify-content:center}.mp-browse{width:100%;max-width:440px;display:flex;flex-direction:column;gap:12px;align-items:center}.mp-rooms{width:100%;display:flex;flex-direction:column;gap:8px;max-height:40vh;overflow-y:auto;padding:2px 6px 6px 2px}.mp-room{font-family:inherit;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;background:#fff;border:3px solid #111;border-radius:12px;box-shadow:3px 4px 0 #111;font-size:22px;cursor:pointer;color:#111}.mp-room b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mp-room span{font-size:18px;color:#888;flex-shrink:0}.mp-room:disabled{opacity:.5;cursor:default}.mp-room:active:not(:disabled){transform:translate(2px,3px);box-shadow:1px 1px 0 #111}.mp-code{font-size:26px;text-align:center}.mp-code b{font-size:44px;color:#c0392b;letter-spacing:6px}.mp-list{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:22px;margin-top:6px}.mp-list span{background:#fff;border:3px solid #111;border-radius:10px;padding:2px 10px}
 #chatBtn{position:fixed;top:36px;left:12px;z-index:5;width:42px;height:42px;border:3px solid #111;border-radius:10px;background:#fff;font-size:20px;display:none;box-shadow:2px 3px 0 #111;cursor:pointer}#chatBar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:12;display:none;flex-wrap:wrap;gap:6px;align-items:center;background:#fff;border:3px solid #111;border-radius:14px;padding:8px;box-shadow:3px 4px 0 #111;width:min(520px,calc(100vw - 24px))}#chatBar.show{display:flex}#chatIn,#mpChatIn{font-family:inherit;font-size:20px;flex:1;min-width:0;padding:4px 10px;border:3px solid #111;border-radius:10px;-webkit-user-select:text;user-select:text}.cq{display:flex;gap:6px;width:100%;flex-wrap:wrap}.cq button,#chatBar>button{font-family:inherit;font-size:17px;font-weight:700;border:2px solid #111;border-radius:8px;background:#ffe24a;padding:2px 8px;cursor:pointer}.mp-chat{height:120px;overflow-y:auto;background:#fff;border:3px solid #111;border-radius:12px;padding:6px 10px;font-size:18px;text-align:left;-webkit-user-select:text;user-select:text}
 </style>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -236,11 +236,14 @@ canvas{display:block;position:fixed;inset:0}
 <div id="mpPage" class="subpage">
   <button class="back-link" onclick="mpBack()">← 뒤로</button>
   <div class="logo small">멀티 모드</div>
-  <p class="hint">같은 핫스팟에 연결하고 시작하세요 (최대 4명)</p>
-  <div class="mp-row"><button class="btn" onclick="mpCreate()">방 만들기</button></div>
-  <div class="mp-row"><input id="mpCode" inputmode="numeric" maxlength="4" placeholder="코드 4자리"><button class="btn gray" style="min-width:0" onclick="mpJoin()">참가</button></div>
+  <p class="hint">방을 만들거나 열린 방에 들어가세요 (최대 4명)</p>
+  <div id="mpBrowse" class="mp-browse">
+    <div class="mp-row"><button class="btn" onclick="mpCreate()">방 만들기</button><button class="btn gray" style="min-width:0" onclick="sfx.click();mpRooms()">🔄</button></div>
+    <div id="mpRoomList" class="mp-rooms"></div>
+  </div>
   <div id="mpRoom"></div>
   <button class="btn" id="mpStartBtn" style="display:none" onclick="mpStart()">게임 시작!</button>
+  <button class="btn gray" id="mpLeaveBtn" style="display:none" onclick="mpExit()">방 나가기</button>
   <p id="mpStatus" class="hint"></p>
   <div id="mpChatWrap" style="display:none;width:100%;max-width:420px"><div id="mpChat" class="mp-chat"></div><div class="mp-row" style="margin-top:6px"><input id="mpChatIn" maxlength="40" placeholder="채팅 입력"><button class="btn gray" style="min-width:0;font-size:20px" onclick="chatSend(null,true)">전송</button></div></div>
 </div>
@@ -1125,7 +1128,7 @@ function retry(){sfx.click();if(lastInfinite)newGame(true);else newGame();allScr
 function pause(){if(M)return;if(G&&G.state==='play'){G.state='pause';joy=null;show('#pause',true)}}
 function resume(){if(G&&G.state==='pause'){G.state='play';show('#pause',false)}}
 function home(){sfx.click();if(M){G=null;['#end','#pause','#levelup'].forEach(id=>show(id,false));$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none';show('#mpPage',true);mpLobbyUI();return}G=null;['#end','#pause','#levelup','#battlePage'].forEach(id=>show(id,false));show('#lobby',true);$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none';$('#profileCard').style.display='flex';$('#lobbyQuick').style.display='flex';updateProfileCard()}
-function endGame(win){G.state='over';joy=null;$('#pauseBtn').style.display='none';$('#retryBtn').style.display=M?'none':'';$('#chatBtn').style.display='none';chatClose();$('#levelup').classList.remove('show');
+function endGame(win){G.state='over';joy=null;$('#pauseBtn').style.display='none';$('#retryBtn').style.display=M?'none':'';if(M)setTimeout(mpUpd,0);$('#chatBtn').style.display='none';chatClose();$('#levelup').classList.remove('show');
   if(G.infinite){sfx.lose();const best=parseInt(localStorage.getItem('ccsg_infbest')||'0');
     if(G.wave>best)localStorage.setItem('ccsg_infbest',String(G.wave));
     const waveGold=G.wave*5,waveXp=G.wave*3;gold+=waveGold;saveGold();gainPlayerXp(waveXp);questTrack('wave',G.wave);
@@ -1154,38 +1157,63 @@ let M=null;const skinCv={};
 function mpSend(o){if(!M)return;if(M.host){for(const c of M.conns)if(c.open&&c.pid)c.send(o)}else if(M.conn&&M.conn.open)M.conn.send(o)}
 function mpStatus(s){$('#mpStatus').textContent=s}
 function mpMe(){return{name:playerName||'찬찬',skin:currentSkin}}
-function mpOpen(){sfx.click();show('#modeSelect',false);show('#mpPage',true);mpLobbyUI()}
-function mpLeave(){if(M){try{M.peer.destroy()}catch(e){}}M=null;$('#mpChat').innerHTML=''}
+const LOBBY='ccsg-lobby.bonto.run';
+const mpWs=()=>new WebSocket('wss://'+LOBBY);
+function relayConn(id,sendFn){const h={};return{peer:id,open:true,send:sendFn,on(e,f){(h[e]=h[e]||[]).push(f)},emit(e,a){(h[e]||[]).forEach(f=>f(a))},close(){if(!this.open)return;this.open=false;this.emit('close')}}}
+function mpOpen(){sfx.click();show('#modeSelect',false);show('#mpPage',true);mpLobbyUI();mpRooms()}
+function mpRooms(){if(M)return;const el=$('#mpRoomList');el.innerHTML='<div class="hint">방 찾는 중...</div>';
+  fetch('https://'+LOBBY+'/rooms').then(r=>r.json()).then(l=>{if(M)return;
+    el.innerHTML=l.length?l.map(r=>'<button class="mp-room"'+(r.playing||r.n>=4?' disabled':'')+' onclick="mpJoin(\''+esc(r.id)+'\',\''+esc(r.peer)+'\',\''+esc(r.name)+'\')"><b>'+esc(r.name)+'</b><span>'+(r.playing?'게임 중':r.n+'/4명')+'</span></button>').join(''):'<div class="hint">열린 방이 없어요. 방을 만들어보세요!</div>'})
+  .catch(()=>{el.innerHTML='<div class="hint">서버 연결 실패. 🔄 눌러서 다시 시도</div>'})}
+function mpLeave(){if(M){M.left=1;try{M.peer.destroy()}catch(e){}try{if(M.ws)M.ws.close()}catch(e){}}M=null;$('#mpChat').innerHTML=''}
 function mpBack(){mpLeave();show('#mpPage',false);mpStatus('');goModeSelect()}
-function mpLobbyUI(){const el=$('#mpRoom');$('#mpChatWrap').style.display=M?'':'none';if(!M){el.innerHTML='';$('#mpStartBtn').style.display='none';return}
+function mpExit(){sfx.click();mpLeave();mpStatus('');mpLobbyUI();mpRooms()}
+function mpLobbyUI(){const el=$('#mpRoom');$('#mpChatWrap').style.display=M?'':'none';$('#mpBrowse').style.display=M?'none':'';$('#mpLeaveBtn').style.display=M?'':'none';
+  if(!M){el.innerHTML='';$('#mpStartBtn').style.display='none';return}
   const names=M.host?Object.values(M.pl).map(p=>p.name):(M.lobby||[]);
-  el.innerHTML=(M.host?'<div class="mp-code">방 코드 <b>'+(M.peer.open?M.code:'...')+'</b></div>':'')+'<div class="mp-list">'+names.map((n,i)=>'<span>'+(i?'🐶 ':'👑 ')+n+'</span>').join('')+'</div>';
+  el.innerHTML='<div class="mp-code"><b>'+esc(M.rname||'')+'</b></div><div class="mp-list">'+names.map((n,i)=>'<span>'+(i?'🐶 ':'👑 ')+esc(n)+'</span>').join('')+'</div>'+(M.via?'<div class="hint">'+M.via+'</div>':'');
   $('#mpStartBtn').style.display=M.host?'':'none'}
+function mpUpd(){if(M&&M.host&&M.ws&&M.ws.readyState===1)M.ws.send(JSON.stringify({t:'upd',n:Object.keys(M.pl).length,playing:!!(G&&G.state!=='over')}))}
 function mpCreate(){sfx.click();if(!window.Peer){mpStatus('네트워크 로딩 실패 (인터넷 확인)');return}mpLeave();
-  const code=String(1000+Math.floor(Math.random()*9000));
-  M={host:true,id:'h',code,conns:[],pl:{h:{...mpMe()}},kc:{},dd:[],st:0,eid:0,ents:new Map(),others:[],peer:new Peer('ccsg-mp-'+code)};
-  const m=M;mpStatus('방 만드는 중...');
-  m.peer.on('open',()=>{if(M!==m)return;mpStatus('코드를 친구에게 알려주세요');mpLobbyUI()});
+  M={host:true,id:'h',rname:(playerName||'찬찬')+'의 방',conns:[],rc:{},pl:{h:{...mpMe()}},kc:{},dd:[],st:0,eid:0,ents:new Map(),others:[],peer:new Peer(),ws:mpWs()};
+  const m=M;mpStatus('방 만드는 중...');mpLobbyUI();
+  const reg=()=>{if(M===m&&m.peer.open&&m.ws.readyState===1&&!m.reg){m.reg=1;m.ws.send(JSON.stringify({t:'host',name:m.rname,peer:m.peer.id}))}};
+  m.peer.on('open',reg);m.ws.onopen=reg;setTimeout(()=>{if(M===m&&!m.reg&&m.ws.readyState===1){m.reg=1;m.ws.send(JSON.stringify({t:'host',name:m.rname,peer:''}))}},6000);
+  m.ws.onmessage=ev=>{if(M!==m)return;const d=JSON.parse(ev.data);
+    if(d.t==='hosted')mpStatus('방이 열렸어요! 친구를 기다리는 중');
+    else if(d.t==='rjoin'){const c=relayConn(d.cid,o=>{if(m.ws.readyState===1)m.ws.send(JSON.stringify({t:'r',to:d.cid,d:o}))});m.rc[d.cid]=c;mpAddConn(m,c)}
+    else if(d.t==='r'){const c=m.rc[d.from];if(c)c.emit('data',d.d)}
+    else if(d.t==='rleave'){const c=m.rc[d.cid];if(c){delete m.rc[d.cid];c.close()}}};
+  m.ws.onclose=()=>{if(M===m)mpStatus('로비 서버 연결이 끊겼어요');for(const k in m.rc)m.rc[k].close()};
   m.peer.on('error',e=>{if(M===m)mpStatus('오류: '+e.type)});
-  m.peer.on('connection',c=>{
-    c.on('data',d=>{if(M===m)mpHostRecv(c,d)});
-    c.on('close',()=>{if(M!==m)return;m.conns=m.conns.filter(x=>x!==c);delete m.pl[c.pid];m.others=m.others.filter(o=>o.id!==c.pid);mpLobbyUI();mpSend({k:'lb',pl:Object.values(m.pl).map(p=>p.name)})});
-    m.conns.push(c)});
-  mpLobbyUI()}
+  m.peer.on('connection',c=>mpAddConn(m,c))}
+function mpAddConn(m,c){
+  c.on('data',d=>{if(M===m)mpHostRecv(c,d)});
+  c.on('close',()=>{if(M!==m)return;m.conns=m.conns.filter(x=>x!==c);delete m.pl[c.pid];m.others=m.others.filter(o=>o.id!==c.pid);mpLobbyUI();mpSend({k:'lb',pl:Object.values(m.pl).map(p=>p.name)});mpUpd()});
+  m.conns.push(c)}
 function mpHostRecv(c,d){
   if(d.k==='j'){if(Object.keys(M.pl).length>=4||(G&&G.state!=='over')){c.send({k:'full'});return}
-    c.pid=c.peer;M.pl[c.pid]={name:d.name,skin:d.skin};c.send({k:'hi',id:c.pid});mpLobbyUI();mpSend({k:'lb',pl:Object.values(M.pl).map(p=>p.name)})}
+    c.pid=c.peer;M.pl[c.pid]={name:String(d.name).slice(0,12),skin:d.skin};c.send({k:'hi',id:c.pid,rn:M.rname});mpLobbyUI();mpSend({k:'lb',pl:Object.values(M.pl).map(p=>p.name)});mpUpd()}
   else if(d.k==='s'){const p=M.pl[c.pid];if(p)p.p=d.p}
   else if(d.k==='c'&&c.pid){d.id=c.pid;d.t=String(d.t).slice(0,40);chatRecv(d);mpSend(d)}
   else if(d.k==='d'&&G&&G.state!=='over'){for(const [id,dm,kx,ky] of d.l){const e=M.ents.get(id);if(e&&!e.dead){M.lh=c.pid;hit(e,dm,kx,ky,true);M.lh=null}}}}
-function mpJoin(){sfx.click();const code=$('#mpCode').value.trim();if(!/^\d{4}$/.test(code)){mpStatus('4자리 코드를 입력하세요');return}
-  if(!window.Peer){mpStatus('네트워크 로딩 실패 (인터넷 확인)');return}mpLeave();
-  M={host:false,id:null,ents:new Map(),killed:new Set(),dq:[],st:0,others:[],lobby:[],peer:new Peer()};const m=M;mpStatus('연결 중...');
-  m.peer.on('open',()=>{if(M!==m)return;const c=m.conn=m.peer.connect('ccsg-mp-'+code,{reliable:true});
-    c.on('open',()=>{c.send({k:'j',...mpMe()});mpStatus('연결됨! 방장이 시작하길 기다리는 중')});
+function mpJoin(room,peerId,rname){sfx.click();if(!window.Peer){mpStatus('네트워크 로딩 실패 (인터넷 확인)');return}mpLeave();
+  M={host:false,id:null,rname,ents:new Map(),killed:new Set(),dq:[],st:0,others:[],lobby:[],peer:new Peer()};const m=M;let done=false;mpStatus('연결 중...');mpLobbyUI();
+  const ok=(c,via)=>{if(done||M!==m)return;done=true;m.conn=c;m.via=via;
     c.on('data',d=>{if(M===m)mpClientRecv(d)});
-    c.on('close',()=>{if(M!==m)return;mpStatus('방장과 연결이 끊겼어요');if(G&&G.state!=='over')endGame(false);M.lobby=[];mpLobbyUI()})});
-  m.peer.on('error',e=>{if(M===m)mpStatus(e.type==='peer-unavailable'?'방을 찾을 수 없어요':'오류: '+e.type)})}
+    c.on('close',()=>{if(M!==m)return;mpStatus('방장과 연결이 끊겼어요');if(G&&G.state!=='over')endGame(false);M.lobby=[];mpLobbyUI()});
+    c.send({k:'j',...mpMe()});mpStatus('입장 완료! 방장이 시작하길 기다리는 중');mpLobbyUI()};
+  const relay=()=>{if(done||M!==m||m.ws)return;try{if(m.pc)m.pc.close()}catch(e){}mpStatus('서버를 통해 연결 중...');
+    const ws=m.ws=mpWs();ws.onopen=()=>ws.send(JSON.stringify({t:'join',room}));
+    ws.onmessage=ev=>{if(M!==m)return;const d=JSON.parse(ev.data);
+      if(d.t==='joined'){m.rconn=relayConn('host',o=>{if(ws.readyState===1)ws.send(JSON.stringify({t:'r',d:o}))});ok(m.rconn,'서버 경유 연결')}
+      else if(d.t==='r'&&m.rconn)m.rconn.emit('data',d.d);
+      else if(d.t==='nojoin')mpStatus('방이 사라졌어요. 뒤로 가서 새로고침')};
+    ws.onclose=()=>{if(m.rconn)m.rconn.close();else if(M===m)mpStatus('서버 연결 실패')}};
+  if(!peerId){relay();return}
+  m.peer.on('open',()=>{if(M!==m)return;const c=m.pc=m.peer.connect(peerId,{reliable:true});c.on('open',()=>{if(done){c.close();return}ok(c,'직접 연결 (P2P)')})});
+  m.peer.on('error',()=>relay());
+  setTimeout(relay,6000)}
 function mpClientRecv(d){
   if(d.k==='hi')M.id=d.id;
   else if(d.k==='full')mpStatus('방이 꽉 찼거나 이미 게임 중이에요');
@@ -1195,7 +1223,7 @@ function mpClientRecv(d){
   else if(d.k==='f'&&G){for(let i=0;i<12;i++){const a=d.o+i*TAU/12;G.eproj.push({x:d.x,y:d.y,vx:Math.cos(a)*150,vy:Math.sin(a)*150,a,r:9,dmg:8,life:5})}}
   else if(d.k==='o'&&G&&G.state!=='over')endGame(false);
   else if(d.k==='c'&&d.id!==M.id)chatRecv(d)}
-function mpStart(){if(!M||!M.host)return;sfx.click();for(const id in M.pl)M.pl[id].p=null;M.kc={};M.dd=[];mpSend({k:'go'});mpStartLocal()}
+function mpStart(){if(!M||!M.host)return;sfx.click();for(const id in M.pl)M.pl[id].p=null;M.kc={};M.dd=[];mpSend({k:'go'});mpStartLocal();mpUpd()}
 function mpStartLocal(){lastInfinite=true;newGame(true);G.multi=true;P.dead=false;M.rev=0;M.st=0;M.ents=new Map();M.others=[];if(!M.host){M.killed=new Set();M.dq=[]}
   allScreens.concat('#mpPage').forEach(id=>show(id,false));$('#pauseBtn').style.display='none';$('#chatBtn').style.display='block';questTrack('play',1)}
 function mpObj(id,a){return{id,x:a[0],y:a[1],hp:a[2],maxHp:a[3],face:a[4],moving:a[5],alive:a[6],cx:a[7],cy:a[8],kills:a[9]||0,name:a[10],skin:a[11]}}
@@ -1246,7 +1274,7 @@ function mpDraw(now){for(const o of M.others){const im=skinCv[o.skin]||dog,s=60/
 function mpHud(){ctx.setTransform(DPR,0,0,DPR,0,0);
   for(const o of M.others){let sx=W/2+(o.x-P.x)*ZOOM,sy=H/2+(o.y-P.y)*ZOOM;if(sx>20&&sx<W-20&&sy>20&&sy<H-20)continue;sx=clamp(sx,40,W-40);sy=clamp(sy,190,H-30);
     fs(ctx,blobP(sx,sy,10,10,.05),o.alive?'#2ecc71':'#aaa',2.5);txt(o.name,sx,sy-18,14,'center')}
-  txt('👥 '+(1+M.others.length)+'명',W-14,84,16,'right','#2d6cdf');
+  txt('👥 '+(1+M.others.length)+'명'+(M.via?' · '+M.via.split(' ')[0]:''),W-14,84,16,'right','#2d6cdf');
   if(M.log){const l=M.log.filter(m=>clock-m.at<8).slice(-4);l.forEach((m,i)=>txt(m.n+': '+m.t,14,H-44-(l.length-1-i)*22,16,'left','#2d6cdf'))}
   if(P.dead)txt('쓰러짐! 동료가 옆에 오면 부활 '+Math.floor(M.rev/3*100)+'%',W/2,H*.75,24,'center','#c0392b')}
 function mpResult(){const l=[{name:playerName||'나',kills:G.kills}].concat(M.others).sort((a,b)=>b.kills-a.kills);
