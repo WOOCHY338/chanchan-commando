@@ -489,6 +489,12 @@ const STAGES=[
   {id:5,name:'폐병원',lv:12,x:860,y:510,mult:2.8,icon:'🏚️',bg:'#fce4ec'},
   {id:6,name:'연구소',lv:16,x:1040,y:140,mult:3.5,icon:'🔬',bg:'#e0f7fa'},
   {id:7,name:'고양이 성',lv:20,x:1200,y:520,mult:4.5,icon:'🏰',bg:'#fff9c4'},
+  {id:8,name:'하수구',lv:24,x:1380,y:150,mult:5.4,icon:'🕳️',bg:'#e8f0e0'},
+  {id:9,name:'화산 지대',lv:28,x:1560,y:520,mult:6.5,icon:'🌋',bg:'#fbe0d5'},
+  {id:10,name:'얼음 왕국',lv:32,x:1740,y:140,mult:7.8,icon:'🧊',bg:'#e3f2fd'},
+  {id:11,name:'우주 정거장',lv:36,x:1920,y:510,mult:9.2,icon:'🚀',bg:'#ede7f6'},
+  {id:12,name:'좀비 공장',lv:40,x:2100,y:150,mult:10.8,icon:'🏭',bg:'#efebe9'},
+  {id:13,name:'고양이 왕좌',lv:45,x:2280,y:520,mult:12.5,icon:'👑',bg:'#fff3c4'},
 ];
 
 /* ---------- 리소스 ---------- */
@@ -525,6 +531,12 @@ function buildSprites(){
     {bg:'#e8dce0',gr:'#b89ca8',st:'#d0c0c8',fl:'#e74c3c',fc:'#f1948a'},
     {bg:'#d0ede8',gr:'#5daa90',st:'#b0d0c8',fl:'#2ecc71',fc:'#82e0aa'},
     {bg:'#ddd0b8',gr:'#a08860',st:'#c8b898',fl:'#c0392b',fc:'#e74c3c'},
+    {bg:'#cfd8c8',gr:'#6b7d5c',st:'#9aa58f',fl:'#7cb342',fc:'#c5e1a5'},
+    {bg:'#ecc9b5',gr:'#8d3b2a',st:'#a0786a',fl:'#ff5722',fc:'#ffab40'},
+    {bg:'#e3f2fd',gr:'#90caf9',st:'#bbdefb',fl:'#ffffff',fc:'#64b5f6'},
+    {bg:'#d6d0ea',gr:'#7e6fb0',st:'#b3a8d9',fl:'#fff59d',fc:'#ffffff'},
+    {bg:'#d7ccc8',gr:'#6d4c41',st:'#a1887f',fl:'#ff7043',fc:'#bdbdbd'},
+    {bg:'#f3e5ab',gr:'#b8860b',st:'#d4b96a',fl:'#8e24aa',fc:'#ffd700'},
   ];
   S.stageBgs=bgThemes.map(t=>{const bg=sprite(480,480,(c,w,h)=>{c.fillStyle=t.bg;c.fillRect(0,0,w,h);
     for(let i=0;i<24;i++){const x=rnd(20,w-20),y=rnd(20,h-20);c.strokeStyle=t.gr;c.lineWidth=2;c.beginPath();for(let k=-1;k<=1;k++){c.moveTo(x+k*4,y);c.lineTo(x+k*7+rnd(-1,1),y-rnd(6,11))}c.stroke()}
@@ -937,9 +949,9 @@ function updateUltBtn(){
 
 /* ---------- 화면 전환 ---------- */
 function buildStageMap(){
-  const map=$('#stageMap');map.innerHTML='';
+  const map=$('#stageMap');map.innerHTML='';const mw=Math.max(...STAGES.map(s=>s.x))+120;map.style.width=mw+'px';
   const svgNS='http://www.w3.org/2000/svg',svg=document.createElementNS(svgNS,'svg');
-  svg.setAttribute('width','1300');svg.setAttribute('height','660');
+  svg.setAttribute('width',mw);svg.setAttribute('height','660');
   svg.style.cssText='position:absolute;inset:0;pointer-events:none';
   for(let i=0;i<STAGES.length-1;i++){
     const a=STAGES[i],b=STAGES[i+1],mx=(a.x+b.x)/2,my=(a.y+b.y)/2+(i%2===0?-30:30);
@@ -981,7 +993,7 @@ function selectStage(id){
 }
 function moveStage(dir){const n=selectedStage+dir;if(n>=1&&n<=stageProgress)selectStage(n)}
 function scrollToStage(id){const w=$('#stageMapWrap');if(!w)return;const s=STAGES[id-1];w.scrollTo({left:Math.max(0,s.x-w.clientWidth/2),behavior:'smooth'})}
-function updateStageInfo(){const s=STAGES[selectedStage-1],stars=Math.min(5,Math.ceil(s.id*5/7)),sc=['#4caf50','#4caf50','#ffc107','#ff9800','#f44336'];$('#siNum').textContent='STAGE '+s.id;$('#siIcon').textContent=s.icon;$('#siName').textContent=s.name;$('#siLv').textContent='권장 Lv.'+s.lv;$('#siStars').textContent='★'.repeat(stars)+'☆'.repeat(5-stars);$('#siStars').style.color=sc[stars-1];const info=$('#stageInfo');if(info)info.style.background=s.bg}
+function updateStageInfo(){const s=STAGES[selectedStage-1],stars=Math.min(5,Math.ceil(s.id*5/STAGES.length)),sc=['#4caf50','#4caf50','#ffc107','#ff9800','#f44336'];$('#siNum').textContent='STAGE '+s.id;$('#siIcon').textContent=s.icon;$('#siName').textContent=s.name;$('#siLv').textContent='권장 Lv.'+s.lv;$('#siStars').textContent='★'.repeat(stars)+'☆'.repeat(5-stars);$('#siStars').style.color=sc[stars-1];const info=$('#stageInfo');if(info)info.style.background=s.bg}
 
 let equipTab=0;
 function buildEquipPage(){switchEquipTab(equipTab)}
