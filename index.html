@@ -137,7 +137,7 @@ canvas{display:block;position:fixed;inset:0}
 .bp-claim:active{transform:scale(.95)}
 .bp-claimed-badge{font-size:11px;color:#4caf50;font-weight:700;margin-top:4px}
 .bp-lock{font-size:11px;color:rgba(255,255,255,.3);margin-top:4px}
-#profileCard{position:fixed;top:12px;left:12px;z-index:11;display:flex;align-items:center;gap:10px;background:#fff;border:3px solid #111;border-radius:14px;padding:6px 14px 6px 6px;box-shadow:3px 4px 0 #111;cursor:pointer;max-width:calc(100vw - 24px)}
+#profileCard{position:relative;display:flex;align-items:center;gap:10px;background:#fff;border:3px solid #111;border-radius:14px;padding:6px 14px 6px 6px;box-shadow:3px 4px 0 #111;cursor:pointer;max-width:calc(100vw - 24px)}
 #profileCard .pf-img{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#fbfaf3}
 #profileCard .pf-img img{width:130%;height:auto;display:block;margin:-2px auto 0;transform:translateX(-12%)}
 #profileCard .pf-info{display:flex;flex-direction:column;line-height:1.2}
@@ -152,6 +152,116 @@ canvas{display:block;position:fixed;inset:0}
 #chatBtn{position:fixed;top:36px;left:12px;z-index:5;width:42px;height:42px;border:3px solid #111;border-radius:10px;background:#fff;font-size:20px;display:none;box-shadow:2px 3px 0 #111;cursor:pointer}#chatBar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:12;display:none;flex-wrap:wrap;gap:6px;align-items:center;background:#fff;border:3px solid #111;border-radius:14px;padding:8px;box-shadow:3px 4px 0 #111;width:min(520px,calc(100vw - 24px))}#chatBar.show{display:flex}#chatIn,#mpChatIn{font-family:inherit;font-size:20px;flex:1;min-width:0;padding:4px 10px;border:3px solid #111;border-radius:10px;-webkit-user-select:text;user-select:text}.cq{display:flex;gap:6px;width:100%;flex-wrap:wrap}.cq button,#chatBar>button{font-family:inherit;font-size:17px;font-weight:700;border:2px solid #111;border-radius:8px;background:#ffe24a;padding:2px 8px;cursor:pointer}.mp-chat{height:120px;overflow-y:auto;background:#fff;border:3px solid #111;border-radius:12px;padding:6px 10px;font-size:18px;text-align:left;-webkit-user-select:text;user-select:text}
 .ntc-modal{position:fixed;inset:0;z-index:101;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px}.ntc-box{background:#fff;border:4px solid #111;border-radius:20px;padding:20px 24px;max-width:440px;width:100%;box-shadow:6px 7px 0 #111;text-align:center}.ntc-title{font-size:32px;font-weight:700;margin-bottom:10px}.ntc-text{font-size:22px;line-height:1.35;white-space:pre-wrap;word-break:break-word;text-align:left;max-height:50vh;overflow-y:auto;-webkit-user-select:text;user-select:text}.ntc-at{font-size:14px;color:#999;margin:10px 0}.ntc-box .btn{font-size:22px;min-width:120px}
 .lobby-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}.lobby-pair .lobby-btn{font-size:18px;padding:18px 2px}.lobby-pair .lbi{font-size:28px}.lobby-btn.fb-btn{background:#ffe0ef}#fbText{width:100%;min-height:130px;font-family:inherit;font-size:20px;padding:8px 10px;border:3px solid #111;border-radius:12px;resize:vertical;margin:8px 0 4px;-webkit-user-select:text;user-select:text}.fb-who{font-size:18px;color:#666;text-align:left}.fb-msg{min-height:24px;font-size:17px;color:#e74c3c;margin-bottom:6px}
+#lobby{justify-content:flex-start;align-items:stretch;gap:0;padding:0 0 74px}
+.subpage{padding-bottom:84px}
+.lb-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px}
+.lb-gold{font-size:22px;font-weight:700;background:#fff;border:3px solid #111;border-radius:12px 8px 13px 7px;padding:4px 14px;box-shadow:3px 4px 0 #111;white-space:nowrap}
+.lb-main{flex:1;min-height:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:0 16px}
+.lb-modes{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.lb-short{font-size:18px;font-weight:700;color:#fff;background:#111;padding:2px 14px;border-radius:8px 4px 9px 3px;margin-bottom:4px}
+.lb-mode{font-family:inherit;font-size:30px;font-weight:700;color:#111;background:rgba(255,255,255,.75);border:3px solid transparent;border-radius:14px 8px 16px 7px;padding:2px 14px;cursor:pointer;text-align:left;white-space:nowrap;transition:font-size .12s}
+.lb-mode.on{font-size:40px;background:#ffe24a;border-color:#111;box-shadow:3px 4px 0 #111}
+.lb-mode.on::after{content:' »'}
+.lb-best{font-size:16px;color:#c0392b;margin-left:8px;vertical-align:middle}
+.lb-best:empty{display:none}
+.lb-mode:active{transform:translate(2px,3px)}
+.lb-stage{display:flex;flex-direction:column;align-items:center;gap:6px}
+.lb-stage .logo{font-size:clamp(40px,6vw,68px)}
+.lb-scene{position:relative;width:min(340px,70vw,calc(42vh * 1.36));aspect-ratio:300/220}
+.lb-scene svg{width:100%;height:100%;display:block}
+.lb-scene #titleDog{position:absolute;left:30%;bottom:-4%;width:46%}
+.lb-banners{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.lb-banner{font-family:inherit;position:relative;width:250px;height:84px;border:4px solid #111;border-radius:14px 10px 16px 9px;box-shadow:4px 5px 0 #111;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 70px 0 16px;color:#111;overflow:hidden;text-align:left}
+.lb-banner:active{transform:translate(3px,4px);box-shadow:1px 1px 0 #111}
+.lb-banner.bp{background:#ffb35c}.lb-banner.qs{background:#8fdcff}.lb-banner.fb{background:#ffb3d9}
+.bn-t{font-size:26px;font-weight:700;line-height:1.05}
+.bn-s{font-size:16px;color:#333}
+.bn-i{position:absolute;right:10px;top:50%;transform:translateY(-50%) rotate(-8deg);font-size:46px}
+@media(max-width:820px){
+  .lb-main{grid-template-columns:1fr;justify-items:center;align-content:center;gap:14px}
+  .lb-stage{order:1}
+  .lb-modes{order:2;flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center}
+  .lb-short{display:none}
+  .lb-mode,.lb-mode.on{font-size:22px}.lb-mode.on::after{content:''}
+  .lb-banners{order:3;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px}
+  .lb-banner{width:auto;height:auto;padding:6px 12px;align-items:center}
+  .bn-s,.bn-i{display:none}.bn-t{font-size:18px}
+}
+@media(max-height:560px) and (min-width:821px){
+  .lb-mode{font-size:24px}.lb-mode.on{font-size:30px}
+  .lb-banner{height:62px}.bn-t{font-size:22px}.bn-s{font-size:14px}.bn-i{font-size:36px}
+}
+#taskbar{position:fixed;left:0;right:0;bottom:0;z-index:20;height:70px;background:#fff;border-top:4px solid #111;display:flex;align-items:center;justify-content:center}
+.tb-items{display:flex;align-items:center;gap:4px;height:100%;max-width:100%;overflow-x:auto;scrollbar-width:none;padding:0 8px}
+.tb-items::-webkit-scrollbar{display:none}
+.tb-btn{font-family:inherit;background:none;border:3px solid transparent;border-radius:12px 8px 14px 7px;cursor:pointer;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:58px;height:58px;padding:0 4px;flex-shrink:0}
+.tb-btn:hover{border-color:#111;background:#ffe24a}
+.tb-btn:active{transform:translate(1px,2px)}
+.tbi{font-size:26px;line-height:1}
+.tbl{font-size:14px;font-weight:700;white-space:nowrap}
+.tb-group{display:flex;align-items:center;gap:4px}
+#taskbar:not(.ingame) .tb-items{width:100%;display:grid;grid-template-columns:1fr auto 1fr;padding:0 12px}
+.tb-left{justify-self:start}.tb-right{justify-self:end}
+#taskbar.ingame .tb-group{display:contents}
+.tb-toggle{display:none;font-family:inherit;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:#fff;border:4px solid #111;box-shadow:3px 4px 0 #111;font-size:26px;font-weight:700;cursor:pointer;color:#111}
+.tb-toggle:active{transform:translate(2px,3px);box-shadow:1px 1px 0 #111}
+#taskbar .tb-exit{display:none}
+#taskbar.ingame{left:12px;bottom:12px;right:auto;height:auto;background:none;border:none}
+#taskbar.ingame .tb-toggle{display:flex}
+#taskbar.ingame.open .tb-toggle{background:#ffe24a}
+#taskbar.ingame .tb-home{display:none}
+#taskbar.ingame .tb-exit{display:flex}
+#taskbar.ingame .tb-items{display:none;position:absolute;left:68px;bottom:0;height:auto;width:max-content;max-width:calc(100vw - 92px);flex-wrap:wrap;overflow:visible;background:#fff;border:4px solid #111;border-radius:14px 10px 16px 9px;box-shadow:3px 4px 0 #111;padding:4px}
+#taskbar.ingame.open .tb-items{display:flex}
+@media (pointer:coarse){
+  #taskbar.ingame .tb-items{left:0;bottom:68px;flex-direction:column;gap:2px;max-height:calc(100vh - 100px);overflow-y:auto}
+  #taskbar.ingame .tb-btn{height:52px}
+  #taskbar.ingame .tb-exit{order:-1}
+}
+@media(max-width:520px){
+  #taskbar:not(.ingame) .tb-items{display:flex;gap:0;padding:0 2px}
+  #taskbar:not(.ingame) .tb-group{display:contents}
+  #taskbar:not(.ingame) .tb-btn{flex:1 1 0;min-width:0;padding:0}
+  #taskbar:not(.ingame) .tbi{font-size:22px}
+  #taskbar:not(.ingame) .tbl{font-size:12px}
+}
+.pf-side{text-align:center;margin:12px 0}
+.pf-gold-side,.pf-shopbtn-side{display:none}
+@media(min-width:900px){.pf-gold-top,.pf-shopbtn-bottom{display:none}.pf-gold-side,.pf-shopbtn-side{display:block}}
+.q-grid>div{margin:8px 16px}
+@media(min-width:900px){
+  .subpage:not(#battlePage).show{display:grid;grid-template-columns:auto auto 1fr;align-content:start;align-items:center;justify-items:center;gap:16px 20px;padding:18px 40px 96px;overflow-y:auto}
+  .subpage:not(#battlePage)>*{grid-column:1/-1}
+  .subpage:not(#battlePage)>.back-link{grid-column:auto;justify-self:start;font-size:20px;background:#fff;border:3px solid #111;border-radius:12px 8px 13px 7px;padding:4px 16px;box-shadow:2px 3px 0 #111}
+  .subpage:not(#battlePage)>.logo.small{grid-column:auto;justify-self:start;font-size:40px;transform:rotate(-2deg)}
+  .subpage:not(#battlePage)>.shop-tabs{grid-column:auto;justify-self:start;width:auto;max-width:none;border-bottom:none;gap:10px;margin-left:12px}
+  .subpage:not(#battlePage) .shop-tabs .shop-tab{flex:0 0 auto;font-size:20px;padding:6px 24px;background:#fff;color:#111;border:3px solid #111;border-radius:12px 8px 13px 7px;box-shadow:2px 3px 0 #111;margin:0}
+  .subpage:not(#battlePage) .shop-tabs .shop-tab.active{background:#ffe24a;border:3px solid #111;margin:0}
+  .subpage:not(#battlePage) .shop-tabs .shop-tab.locked{opacity:.4}
+  .shop-content,#equipContent,#questContent,#profileContent,#bpHeader,#bpTrack{width:100%!important;max-width:1400px!important;overflow:visible!important;flex:none!important;padding-left:0;padding-right:0}
+  .skin-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));justify-content:stretch}
+  .inv-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));justify-content:stretch}
+  .inv-item{width:auto;height:96px}
+  .equip-title{text-align:left;font-size:24px}
+  #bpPage.subpage>.back-link{background:#3d2b1f;border-color:#f39c12;box-shadow:2px 3px 0 #f39c12}
+  .pf-layout,.eq-layout{display:grid;grid-template-columns:330px 1fr;gap:32px;align-items:start}
+  .pf-side,.eq-side{position:sticky;top:0;margin:0;background:#fff;border:4px solid #111;border-radius:18px 12px 20px 10px;box-shadow:4px 5px 0 #111;padding:20px;text-align:center}
+  .eq-side .equip-slots{flex-wrap:wrap}
+  .q-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-top:8px}
+  .q-grid>div{margin:0!important}
+  #bpHeader{text-align:left;display:block}
+  .bp-h{display:grid;grid-template-columns:repeat(10,1fr);gap:10px;position:relative;padding-top:6px}
+  .bp-h::before{content:'';position:absolute;top:22px;left:5%;right:5%;height:4px;border-radius:2px;background:linear-gradient(90deg,#f39c12,#e74c3c,#9b59b6)}
+  .bp-hcol{display:flex;flex-direction:column;align-items:stretch;gap:10px}
+  .bp-h .bp-dot{position:relative;left:auto;transform:none;margin:0 auto}
+  .bp-h .bp-card{width:auto;min-height:150px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .mode-grid{max-width:1100px;gap:24px}
+  .mode-card{padding:40px 20px}
+  .mode-card .mode-icon{font-size:72px}
+  .mode-card .mode-name{font-size:34px}
+  .mode-card .mode-desc{font-size:19px}
+  .mp-browse{max-width:760px}
+}
 </style>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
@@ -163,18 +273,58 @@ canvas{display:block;position:fixed;inset:0}
 <div id="chatBar"><div class="cq"><button onclick="chatSend('살려줘!')">살려줘!</button><button onclick="chatSend('이쪽으로!')">이쪽으로!</button><button onclick="chatSend('보스 온다!')">보스 온다!</button><button onclick="chatSend('고마워!')">고마워!</button><button onclick="chatSend('ㅋㅋㅋㅋ')">ㅋㅋㅋ</button></div><input id="chatIn" maxlength="40" placeholder="메시지 입력"><button onclick="chatSend()">전송</button><button onclick="chatClose()">✕</button></div>
 
 <div id="lobby" class="overlay show">
-  <div id="profileCard" onclick="goPage('shop');switchShopTab(3)"></div>
-  <div id="lobbyQuick"><button class="qbtn" onclick="openBP()">🎖️ 배틀패스</button><button class="qbtn" onclick="openQuest()">📋 퀘스트</button></div>
-  <div class="logo">찬찬특공개</div>
-  <img id="titleDog" alt="">
-  <p class="sub">좀비 고양이 왕을 물리쳐라!</p>
-  <div class="lobby-grid">
-    <button class="lobby-btn" onclick="goPage('shop')"><span class="lbi">🏪</span>상점</button>
-    <button class="lobby-btn equip-btn" onclick="goPage('equip')"><span class="lbi">⚔️</span>장비</button>
-    <button class="lobby-btn battle" onclick="goModeSelect()"><span class="lbi">💥</span>전투</button>
-    <div class="lobby-pair"><button class="lobby-btn" onclick="goPage('settings')"><span class="lbi">⚙️</span>메뉴</button><button class="lobby-btn fb-btn" onclick="openFeedback()"><span class="lbi">💌</span>의견함</button></div>
+  <div class="lb-top">
+    <div id="profileCard" onclick="menuGo(()=>goPage('profile'))"></div>
+    <div class="lb-gold">🪙 <b id="lbGold">0</b>G</div>
+  </div>
+  <div class="lb-main">
+    <div class="lb-modes">
+      <div class="lb-short">바로가기</div>
+      <button class="lb-mode on" onclick="menuGo(()=>goPage('battle'))">일반 모드</button>
+      <button class="lb-mode" onclick="startInfinite()">무한 모드<span class="lb-best" id="lbInfBest"></span></button>
+      <button class="lb-mode" onclick="menuGo(mpOpen)">멀티 모드</button>
+    </div>
+    <div class="lb-stage">
+      <div class="logo">찬찬특공개</div>
+      <div class="lb-scene">
+        <svg viewBox="0 0 300 220" aria-hidden="true" fill="none" stroke="#111" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M42 96 L263 93 L266 213 L37 215 Z" fill="#e8a96a"/>
+          <path d="M60 130 L120 128 M180 127 L246 129 M58 172 L114 171 M188 170 L248 172" stroke-width="3" opacity=".45"/>
+          <path d="M16 110 L151 11 L287 106 L270 118 L151 36 L33 121 Z" fill="#d9483b"/>
+          <path d="M117 214 L118 152 Q150 110 185 151 L184 214" fill="#5a341c"/>
+          <path d="M112 58 L189 56 L190 84 L111 86 Z" fill="#fff" stroke-width="4"/>
+          <text x="150" y="80" text-anchor="middle" font-family="Gaegu,sans-serif" font-weight="700" font-size="24" fill="#111" stroke="none">찬찬네</text>
+          <path d="M8 214 L292 212 M22 214 L18 202 M30 214 L33 200 M270 213 L266 199 M279 213 L284 201" stroke="#5a9c3a" stroke-width="4"/>
+        </svg>
+        <img id="titleDog" alt="">
+      </div>
+    </div>
+    <div class="lb-banners">
+      <button class="lb-banner bp" onclick="menuGo(openBP)"><span class="bn-t">배틀패스</span><span class="bn-s" id="bnBp">시즌 1</span><span class="bn-i">🎖️</span></button>
+      <button class="lb-banner qs" onclick="menuGo(openQuest)"><span class="bn-t">일일 퀘스트</span><span class="bn-s">매일 새 퀘스트!</span><span class="bn-i">📋</span></button>
+      <button class="lb-banner fb" onclick="menuGo(openFeedback)"><span class="bn-t">의견함</span><span class="bn-s">하고 싶은 말 보내기</span><span class="bn-i">💌</span></button>
+    </div>
   </div>
 </div>
+
+<nav id="taskbar">
+  <button class="tb-toggle" onclick="tbToggle()" aria-label="메뉴 열기">☰</button>
+  <div class="tb-items">
+    <div class="tb-group tb-left"></div>
+    <div class="tb-group tb-center">
+      <button class="tb-btn tb-home" onclick="menuGo(goLobby)"><span class="tbi">🏠</span><span class="tbl">홈</span></button>
+      <button class="tb-btn" onclick="menuGo(()=>goPage('equip'))"><span class="tbi">⚔️</span><span class="tbl">장비</span></button>
+      <button class="tb-btn" onclick="menuGo(()=>goPage('shop'))"><span class="tbi">🏪</span><span class="tbl">상점</span></button>
+      <button class="tb-btn" onclick="menuGo(openBP)"><span class="tbi">🎖️</span><span class="tbl">배틀패스</span></button>
+    </div>
+    <div class="tb-group tb-right">
+      <button class="tb-btn" onclick="menuGo(openQuest)"><span class="tbi">📋</span><span class="tbl">퀘스트</span></button>
+      <button class="tb-btn" onclick="menuGo(openFeedback)"><span class="tbi">💌</span><span class="tbl">의견함</span></button>
+      <button class="tb-btn" onclick="menuGo(()=>goPage('settings'))"><span class="tbi">⚙️</span><span class="tbl">설정</span></button>
+      <button class="tb-btn tb-exit" onclick="tbExit()"><span class="tbi">🚪</span><span class="tbl">나가기</span></button>
+    </div>
+  </div>
+</nav>
 
 <div id="shopPage" class="subpage">
   <button class="back-link" onclick="goLobby()">← 뒤로</button>
@@ -272,9 +422,15 @@ canvas{display:block;position:fixed;inset:0}
   </div>
 </div>
 
+<div id="profilePage" class="subpage">
+  <button class="back-link" onclick="goLobby()">← 뒤로</button>
+  <div class="logo small">프로필</div>
+  <div id="profileContent" class="shop-content"></div>
+</div>
+
 <div id="settingsPage" class="subpage">
   <button class="back-link" onclick="goLobby()">← 뒤로</button>
-  <div class="logo small">메뉴</div>
+  <div class="logo small">설정</div>
   <p class="coming">준비 중...</p>
 </div>
 
@@ -1002,12 +1158,12 @@ function switchEquipTab(idx){
   equipTab=idx;
   document.querySelectorAll('#equipTabs .shop-tab').forEach((t,i)=>{t.classList.toggle('active',i===idx)});
   const el=$('#equipContent');if(!el)return;
-  if(idx===0){let h='<div class="equip-title">장착 중 ('+eqEquipped.length+'/'+MAX_EQ+')</div><div class="equip-slots">';
+  if(idx===0){let h='<div class="eq-layout"><div class="eq-side"><div class="equip-title">장착 중 ('+eqEquipped.length+'/'+MAX_EQ+')</div><div class="equip-slots">';
     for(let i=0;i<MAX_EQ;i++){if(i<eqEquipped.length){const eq=EQUIPS[eqEquipped[i]];h+='<div class="equip-slot" onclick="unequipItem('+i+')"><span>'+eq.icon+'</span><span class="eq-name">'+eq.name+'</span></div>'}else h+='<div class="equip-slot empty">+</div>'}
-    h+='</div><div class="equip-title">보유 장비 ('+eqInv.length+')</div>';
+    h+='</div></div><div class="eq-main"><div class="equip-title">보유 장비 ('+eqInv.length+')</div>';
     if(eqInv.length===0)h+='<div class="equip-empty">장비가 없습니다<br><span style="font-size:16px">전투에서 적을 처치하면 장비를 얻습니다</span></div>';
     else{h+='<div class="inv-grid">';eqInv.forEach((id,i)=>{const eq=EQUIPS[id];h+='<div class="inv-item" onclick="equipItem('+i+')"><span>'+eq.icon+'</span><span class="eq-nm">'+eq.name+'</span><span class="eq-desc">'+eq.desc+'</span></div>'});h+='</div>'}
-    el.innerHTML=h}
+    h+='</div></div>';el.innerHTML=h}
   else if(idx===1){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div>';
     if(eqInv.length===0)h+='<div class="equip-empty">판매할 장비가 없습니다</div>';
     else{h+='<div class="inv-grid">';eqInv.forEach((id,i)=>{const eq=EQUIPS[id];h+='<div class="inv-item" onclick="sellEquip('+i+')" style="border-color:#e67e22"><span>'+eq.icon+'</span><span class="eq-nm">'+eq.name+'</span><span class="eq-desc" style="color:#e67e22;font-weight:700">'+eq.sell+'G</span></div>'});h+='</div>'}
@@ -1041,24 +1197,7 @@ function switchShopTab(idx){
       let btn;if(sel)btn='장착 중';else if(own)btn='장착';else btn=u.price+'G';
       h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'equipUlt':'buyUlt')+'(\''+id+'\')"><div style="font-size:48px;padding:12px">'+u.icon+'</div><div class="sk-name">'+u.name+'</div><div style="font-size:13px;color:#666;padding:2px 6px">'+u.desc+'</div><div style="font-size:12px;color:#999;margin:2px 0">쿨타임 '+u.cd+'초 · 포인트 '+u.pts+'개</div><div class="sk-badge'+(sel?' on':'')+'">'+btn+'</div></div>'}
     h+='</div>';el.innerHTML=h}
-  else if(idx===3){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div>';
-    h+='<div style="text-align:center;margin:12px 0"><div style="position:relative;display:inline-block;width:100px;height:100px;border-radius:50%;overflow:hidden;'+getBorderCSS(equippedBorder)+'"><img src="'+(skinURLs[currentSkin]||dogURL)+'" style="width:130%;height:auto;position:absolute;top:0;left:50%;transform:translateX(-50%)"></div>';
-    h+='<div style="font-size:22px;font-weight:700;margin-top:8px">'+(playerName||'???')+'</div>';
-    if(equippedTitle&&TITLES[equippedTitle])h+='<div style="font-size:16px;font-weight:700;color:'+TITLES[equippedTitle].color+'">'+TITLES[equippedTitle].name+'</div>';
-    h+='<div style="font-size:14px;color:#888;margin-top:2px">Lv. '+playerLevel+' ('+playerXp+'/'+plvXp(playerLevel)+' XP)</div></div>';
-    if(ownedTitles.length>0){h+='<div class="equip-title">칭호</div><div class="skin-grid">';
-      h+='<div class="skin-card'+(equippedTitle===''?' selected':'')+'" onclick="equipTitle(\'\')"><div style="font-size:28px;padding:12px">🚫</div><div class="sk-name" style="font-size:13px">칭호 없음</div><div class="sk-badge'+(equippedTitle===''?' on':'')+'">'+(!equippedTitle?'사용 중':'해제')+'</div></div>';
-      for(const id of ownedTitles){const t=TITLES[id];if(!t)continue;const sel=equippedTitle===id;
-        h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="equipTitle(\''+id+'\')"><div style="font-size:28px;padding:12px;color:'+t.color+'">🏷️</div><div class="sk-name" style="font-size:13px;color:'+t.color+'">'+t.name+'</div><div class="sk-badge'+(sel?' on':'')+'">'+(sel?'사용 중':'장착')+'</div></div>'}
-      h+='</div>'}
-    h+='<div class="equip-title">테두리</div><div class="skin-grid">';
-    BORDERS.forEach(b=>{const own=ownedBorders.indexOf(b.id)>=0,sel=equippedBorder===b.id;
-      let btn;if(sel)btn='장착 중';else if(own)btn='장착';else btn=b.price+'G';
-      h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'selectBorder':'buyBorder')+'(\''+b.id+'\')"><div style="width:60px;height:60px;border-radius:50%;'+getBorderCSS(b.id)+'background-color:#fbfaf3;margin:8px auto"></div><div class="sk-name" style="font-size:13px">'+b.name+'</div><div class="sk-badge'+(sel?' on':'')+'">'+btn+'</div></div>'});
-    for(const id in BP_BORDERS){const b=BP_BORDERS[id],own=ownedBorders.indexOf(id)>=0,sel=equippedBorder===id;if(!own)continue;
-      let btn=sel?'장착 중':'장착';
-      h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="selectBorder(\''+id+'\')"><div style="width:60px;height:60px;border-radius:50%;'+getBorderCSS(id)+'background-color:#fbfaf3;margin:8px auto"></div><div class="sk-name" style="font-size:13px">'+b.name+'<br><span style="color:#e67e22;font-size:11px">배틀패스</span></div><div class="sk-badge'+(sel?' on':'')+'">'+btn+'</div></div>'}
-    h+='</div>';el.innerHTML=h}
+  else if(idx===3){el.innerHTML=profileHTML(true)}
   else if(idx===4){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="skin-grid">';SKINS.forEach(s=>{if(!skinURLs[s.id])return;const sel=s.id===currentSkin,own=ownedSkins.indexOf(s.id)>=0;let btn;if(sel)btn='착용 중';else if(own)btn='착용';else btn=s.price+'G';h+='<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'selectSkin':'buySkin')+'(\''+s.id+'\')"><img src="'+skinURLs[s.id]+'" class="skin-preview"><div class="skin-name">'+s.name+'</div><div class="skin-btn">'+btn+'</div></div>'});h+='</div>';el.innerHTML=h}
   else if(idx===2){let h='<div style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div><div class="equip-title">동료</div>';
     for(const id in COMPANIONS){const c=COMPANIONS[id],own=ownedCompanions.indexOf(id)>=0,sel=equippedCompanion===id;
@@ -1078,8 +1217,35 @@ function buyUlt(id){const u=ULTIMATES[id];if(!u||gold<u.price)return;sfx.click()
 function equipUlt(id){sfx.click();equippedUlt=id;saveUlts();switchShopTab(1)}
 function getBorderCSS(id){let b=BORDERS.find(x=>x.id===id);if(!b)b=BP_BORDERS[id];if(!b||b.style==='none')return '';let s='border:'+b.style+';';if(b.bg)s+='background-image:'+b.bg+';background-origin:border-box;background-clip:border-box;';if(b.shadow)s+='box-shadow:'+b.shadow+';';return s}
 function buyBorder(id){const b=BORDERS.find(x=>x.id===id);if(!b||gold<b.price)return;sfx.click();gold-=b.price;ownedBorders.push(id);saveGold();saveBorders();selectBorder(id)}
-function selectBorder(id){sfx.click();equippedBorder=id;saveBorders();switchShopTab(3)}
-function openBP(){sfx.click();show('#lobby',false);show('#bpPage',true);$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';buildBP()}
+function selectBorder(id){sfx.click();equippedBorder=id;saveBorders();refreshProfileViews()}
+function refreshProfileViews(){if($('#profilePage').classList.contains('show'))buildProfilePage();else switchShopTab(3)}
+function buildProfilePage(){$('#profileContent').innerHTML=profileHTML(false)}
+function borderCard(id,name,tag,own,price){const sel=equippedBorder===id;
+  return '<div class="skin-card'+(sel?' selected':'')+'" onclick="'+(own?'selectBorder':'buyBorder')+'(\''+id+'\')"><div style="width:60px;height:60px;border-radius:50%;'+getBorderCSS(id)+'background-color:#fbfaf3;margin:8px auto"></div><div class="sk-name" style="font-size:13px">'+name+(tag?'<br><span style="color:#e67e22;font-size:11px">'+tag+'</span>':'')+'</div><div class="sk-badge'+(sel?' on':'')+'">'+(sel?'장착 중':own?'장착':price+'G')+'</div></div>'}
+function profileHTML(shop){
+  const t=equippedTitle&&TITLES[equippedTitle],sz=shop?100:110,goShop='menuGo(()=>{goPage(\'shop\');switchShopTab(3)})';
+  let s=shop?'<div class="pf-gold-top" style="text-align:center;padding:8px 0;font-size:18px;font-weight:700">골드: '+gold+'G</div>':'';
+  s+='<div class="pf-layout"><div class="pf-side"><div style="position:relative;display:inline-block;width:'+sz+'px;height:'+sz+'px;border-radius:50%;overflow:hidden;'+getBorderCSS(equippedBorder)+'"><img src="'+(skinURLs[currentSkin]||dogURL)+'" style="width:130%;height:auto;position:absolute;top:0;left:50%;transform:translateX(-50%)"></div>';
+  s+='<div style="font-size:'+(shop?22:24)+'px;font-weight:700;margin-top:8px">'+(playerName||'???')+'</div>';
+  if(t||!shop)s+='<div style="font-size:'+(shop?16:17)+'px;font-weight:700;min-height:22px;color:'+(t?t.color+'">'+t.name:'#aaa">칭호 없음')+'</div>';
+  s+='<div style="font-size:14px;color:#888;margin-top:2px">Lv. '+playerLevel+' ('+playerXp+'/'+plvXp(playerLevel)+' XP)</div>';
+  s+='<div class="pf-gold-side" style="font-size:18px;font-weight:700;margin-top:10px">🪙 '+gold+'G</div>';
+  if(!shop)s+='<button class="btn gray pf-shopbtn-side" style="font-size:18px;min-width:0;margin:12px auto 0;padding:4px 14px" onclick="'+goShop+'">🏪 테두리 사러 가기</button>';
+  s+='</div>';
+  let m='<div class="pf-main">';
+  if(!shop||ownedTitles.length){m+='<div class="equip-title">칭호</div><div class="skin-grid">';
+    m+='<div class="skin-card'+(!equippedTitle?' selected':'')+'" onclick="equipTitle(\'\')"><div style="font-size:28px;padding:12px">🚫</div><div class="sk-name" style="font-size:13px">칭호 없음</div><div class="sk-badge'+(!equippedTitle?' on':'')+'">'+(!equippedTitle?'사용 중':'해제')+'</div></div>';
+    for(const id of ownedTitles){const ti=TITLES[id];if(!ti)continue;const sel=equippedTitle===id;
+      m+='<div class="skin-card'+(sel?' selected':'')+'" onclick="equipTitle(\''+id+'\')"><div style="font-size:28px;padding:12px;color:'+ti.color+'">🏷️</div><div class="sk-name" style="font-size:13px;color:'+ti.color+'">'+ti.name+'</div><div class="sk-badge'+(sel?' on':'')+'">'+(sel?'사용 중':'장착')+'</div></div>'}
+    m+='</div>';
+    if(!ownedTitles.length)m+='<div class="equip-empty" style="margin:8px 0">칭호는 배틀패스 보상으로 얻을 수 있어요</div>'}
+  m+='<div class="equip-title">테두리</div><div class="skin-grid">';
+  for(const b of BORDERS){const own=ownedBorders.includes(b.id);if(shop||own)m+=borderCard(b.id,b.name,'',own,b.price)}
+  for(const id in BP_BORDERS)if(ownedBorders.includes(id))m+=borderCard(id,BP_BORDERS[id].name,'배틀패스',true,0);
+  m+='</div></div></div>';
+  if(!shop)m+='<div class="pf-shopbtn-bottom" style="text-align:center;margin:16px 0"><button class="btn gray" style="font-size:20px;min-width:0" onclick="'+goShop+'">🏪 상점에서 테두리 더 보기</button></div>';
+  return s+m}
+function openBP(){sfx.click();show('#lobby',false);show('#bpPage',true);$('#profileCard').style.display='none';buildBP()}
 function buildBP(){const hd=$('#bpHeader'),tr=$('#bpTrack');if(!hd||!tr)return;
   const pct=Math.min(100,playerXp/plvXp(playerLevel)*100);
   let h='<div style="font-size:14px;color:rgba(255,255,255,.5);letter-spacing:2px">SEASON 1</div>';
@@ -1087,6 +1253,13 @@ function buildBP(){const hd=$('#bpHeader'),tr=$('#bpTrack');if(!hd||!tr)return;
   h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0"><span style="font-size:20px;font-weight:700;color:#f39c12">Lv.'+playerLevel+'</span><span style="font-size:14px;color:rgba(255,255,255,.5)">'+playerXp+' / '+plvXp(playerLevel)+' XP</span></div>';
   h+='<div class="bp-bar"><div class="bp-bar-fill" style="width:'+pct+'%"></div></div>';
   hd.innerHTML=h;
+  if(matchMedia('(min-width:900px)').matches){let t='<div class="bp-h">';
+    for(let lv=1;lv<=10;lv++){const rewards=BP_REWARDS.filter(r=>r.lv===lv),unlocked=playerLevel>=lv,allClaimed=rewards.every(r=>bpClaimed.indexOf(r.lv+':'+r.type+':'+r.val)>=0);
+      t+='<div class="bp-hcol"><div class="bp-dot '+(allClaimed?'done':unlocked?'on':'')+'">'+lv+'</div><div class="bp-card '+(allClaimed?'claimed':unlocked?'on':'')+'" style="'+(unlocked?'':'opacity:.5')+'">';
+      for(const r of rewards)t+='<div class="bp-icon">'+r.icon+'</div><div class="bp-desc">'+r.desc+'</div>';
+      if(!unlocked)t+='<div class="bp-lock">🔒 Lv.'+lv+' 필요</div>';else if(allClaimed)t+='<div class="bp-claimed-badge">✓ 수령 완료</div>';else t+='<button class="bp-claim" onclick="claimBP('+lv+')">보상 수령</button>';
+      t+='</div></div>'}
+    tr.innerHTML=t+'</div>';return}
   let t='<div style="position:relative;padding-top:12px">';
   const lvs=[1,2,3,4,5,6,7,8,9,10];let totalH=lvs.length*86;
   t+='<div class="bp-track-line" style="top:28px;height:'+(totalH-40)+'px"></div>';
@@ -1107,11 +1280,12 @@ function claimBP(lv){if(playerLevel<lv)return;const rewards=BP_REWARDS.filter(r=
     else if(r.type==='title'){if(ownedTitles.indexOf(r.val)<0)ownedTitles.push(r.val);saveTitles()}
     else if(r.type==='border'){if(ownedBorders.indexOf(r.val)<0)ownedBorders.push(r.val);saveBorders()}}
   sfx.click();saveBP();buildBP()}
-function openQuest(){sfx.click();show('#lobby',false);show('#questPage',true);$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';initDaily();buildQuest()}
+function openQuest(){sfx.click();show('#lobby',false);show('#questPage',true);$('#profileCard').style.display='none';initDaily();buildQuest()}
 function buildQuest(){const el=$('#questContent');if(!el||!dailyData)return;
   const now=new Date(),reset=new Date(now);reset.setHours(24,0,0,0);const left=Math.max(0,Math.floor((reset-now)/1000)),hh=String(Math.floor(left/3600)).padStart(2,'0'),mm=String(Math.floor(left%3600/60)).padStart(2,'0'),ss=String(left%60).padStart(2,'0');
   let h='<div style="text-align:center;padding:8px 0;font-size:15px;color:#888">리셋까지 '+hh+':'+mm+':'+ss+'</div>';
   h+='<div style="text-align:center;padding:4px 0;font-size:18px;font-weight:700">Lv. '+playerLevel+' ('+playerXp+'/'+plvXp(playerLevel)+' XP)</div>';
+  h+='<div class="q-grid">';
   for(let i=0;i<dailyData.quests.length;i++){const q=dailyData.quests[i],pct=Math.min(100,q.progress/q.target*100);
     h+='<div style="border:3px solid '+(q.claimed?'#4caf50':q.done?'#f39c12':'#111')+';border-radius:14px;padding:12px;margin:8px 16px;background:#fff;box-shadow:2px 3px 0 '+(q.claimed?'#4caf50':q.done?'#f39c12':'#111')+'">';
     h+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:28px">'+q.icon+'</span><div style="flex:1"><div style="font-size:17px;font-weight:700">'+q.name+'</div>';
@@ -1121,27 +1295,38 @@ function buildQuest(){const el=$('#questContent');if(!el||!dailyData)return;
     else if(q.done)h+='<button class="btn" style="font-size:14px;padding:3px 12px;min-width:0" onclick="claimQuest('+i+')">수령</button>';
     else h+='<span style="font-size:13px;color:#999">진행 중</span>';
     h+='</div></div>'}
-  el.innerHTML=h}
+  h+='</div>';el.innerHTML=h}
 function claimQuest(i){if(!dailyData||!dailyData.quests[i]||dailyData.quests[i].claimed)return;const q=dailyData.quests[i];q.claimed=true;gold+=q.gold;saveGold();gainPlayerXp(q.xp);saveDaily();sfx.click();buildQuest()}
-function equipTitle(id){sfx.click();equippedTitle=id;saveTitles();switchShopTab(3)}
+function equipTitle(id){sfx.click();equippedTitle=id;saveTitles();refreshProfileViews()}
 function promptNickname(){const d=document.createElement('div');d.id='nickModal';d.style.cssText='position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6)';
   d.innerHTML='<div style="background:#fff;border:4px solid #111;border-radius:20px;padding:28px;max-width:340px;width:90%;text-align:center;box-shadow:6px 7px 0 #111"><div style="font-size:28px;font-weight:700;margin-bottom:6px">닉네임 설정</div><div style="font-size:16px;color:#e74c3c;margin-bottom:14px">한번 정하면 바꿀 수 없습니다!</div><input id="nickInput" style="font-family:inherit;font-size:22px;padding:8px 14px;border:3px solid #111;border-radius:10px;width:100%;text-align:center;box-sizing:border-box" maxlength="12" placeholder="닉네임 입력"><div style="margin-top:14px"><button class="btn" style="font-size:22px;min-width:120px" onclick="confirmNick()">확인</button></div></div>';
   document.body.appendChild(d);setTimeout(()=>$('#nickInput').focus(),100)}
 function confirmNick(){const v=$('#nickInput').value.trim();if(!v)return;playerName=v;localStorage.setItem('ccsg_name',playerName);const m=$('#nickModal');if(m)m.remove()}
 
 const show=(id,on)=>$(id).classList.toggle('show',on);
-const allScreens=['#lobby','#battlePage','#shopPage','#equipPage','#settingsPage','#modeSelect','#bpPage','#questPage','#end','#pause','#levelup'];
-function goPage(id){sfx.click();show('#lobby',false);show('#modeSelect',false);show('#'+id+'Page',true);$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';if(id==='battle'){buildStageMap();setTimeout(()=>scrollToStage(selectedStage),50)}else if(id==='equip')buildEquipPage();else if(id==='shop')buildShopPage()}
-function goModeSelect(){sfx.click();show('#lobby',false);show('#modeSelect',true);$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';const b=parseInt(localStorage.getItem('ccsg_infbest')||'0');$('#infiniteBest').textContent=b?'최고 기록: WAVE '+b:''}
-function updateProfileCard(){const el=$('#profileCard');if(!el)return;let ti=equippedTitle&&TITLES[equippedTitle]?'<span class="pf-title" style="color:'+TITLES[equippedTitle].color+'">'+TITLES[equippedTitle].name+'</span>':'';el.innerHTML='<div class="pf-img" style="'+getBorderCSS(equippedBorder)+'"><img src="'+(skinURLs[currentSkin]||dogURL)+'"></div><div class="pf-info"><span class="pf-lv">Lv. '+playerLevel+'</span><span class="pf-name">'+(playerName||'???')+'</span>'+ti+'</div>'}
-function goLobby(){sfx.click();['#shopPage','#equipPage','#battlePage','#settingsPage','#modeSelect','#bpPage','#questPage'].forEach(id=>show(id,false));show('#lobby',true);$('#profileCard').style.display='flex';$('#lobbyQuick').style.display='flex';updateProfileCard()}
+const allScreens=['#lobby','#battlePage','#shopPage','#equipPage','#settingsPage','#profilePage','#modeSelect','#bpPage','#questPage','#end','#pause','#levelup'];
+function goPage(id){sfx.click();show('#lobby',false);show('#modeSelect',false);show('#'+id+'Page',true);$('#profileCard').style.display='none';if(id==='battle'){buildStageMap();setTimeout(()=>scrollToStage(selectedStage),50)}else if(id==='equip')buildEquipPage();else if(id==='shop')buildShopPage();else if(id==='profile')buildProfilePage()}
+function goModeSelect(){sfx.click();show('#lobby',false);show('#modeSelect',true);$('#profileCard').style.display='none';const b=parseInt(localStorage.getItem('ccsg_infbest')||'0');$('#infiniteBest').textContent=b?'최고 기록: WAVE '+b:''}
+function updateProfileCard(){const el=$('#profileCard');if(!el)return;let ti=equippedTitle&&TITLES[equippedTitle]?'<span class="pf-title" style="color:'+TITLES[equippedTitle].color+'">'+TITLES[equippedTitle].name+'</span>':'';el.innerHTML='<div class="pf-img" style="'+getBorderCSS(equippedBorder)+'"><img src="'+(skinURLs[currentSkin]||dogURL)+'"></div><div class="pf-info"><span class="pf-lv">Lv. '+playerLevel+'</span><span class="pf-name">'+(playerName||'???')+'</span>'+ti+'</div>';$('#lbGold').textContent=gold.toLocaleString();$('#bnBp').textContent='시즌 1 · Lv.'+playerLevel;const ib=parseInt(localStorage.getItem('ccsg_infbest')||'0');$('#lbInfBest').textContent=ib?'최고 WAVE '+ib:''}
+const PAGES=['#shopPage','#equipPage','#battlePage','#settingsPage','#modeSelect','#bpPage','#questPage','#mpPage','#profilePage'];
+const pageOpen=()=>PAGES.some(id=>$(id).classList.contains('show'))||!!$('#fbModal');
+function closePages(){if(M&&!G&&$('#mpPage').classList.contains('show')){mpLeave();mpStatus('')}PAGES.forEach(id=>show(id,false));const f=$('#fbModal');if(f)f.remove()}
+function tbClose(){$('#taskbar').classList.remove('open')}
+function tbToggle(){sfx.click();$('#taskbar').classList.toggle('open')}
+function menuGo(fn){tbClose();if(G&&G.state==='play'&&!M){G.state='pause';G.menuPaused=true;joy=null}closePages();fn()}
+function tbExit(){if(G&&G.state!=='over'&&!confirm('전투를 그만두고 나갈까요? 이번 판 보상은 받을 수 없어요.'))return;tbClose();closePages();if(G)G.menuPaused=false;home()}
+function tbSync(){const tb=$('#taskbar');tb.classList.toggle('ingame',!!G);if(!G)tb.classList.remove('open');tb.style.display=G&&(G.state==='levelup'||G.state==='ult')?'none':'';
+  if(G&&G.menuPaused&&!pageOpen()){G.menuPaused=false;if(G.state==='pause')G.state='play'}}
+document.querySelectorAll('.lb-mode').forEach(b=>b.addEventListener('mouseenter',()=>document.querySelectorAll('.lb-mode').forEach(x=>x.classList.toggle('on',x===b))));
+cv.addEventListener('pointerdown',tbClose);
+function goLobby(){sfx.click();['#shopPage','#equipPage','#battlePage','#settingsPage','#modeSelect','#bpPage','#questPage','#profilePage'].forEach(id=>show(id,false));if(G)return;show('#lobby',true);$('#profileCard').style.display='flex';updateProfileCard()}
 let lastInfinite=false;
-function start(){sfx.click();lastInfinite=false;newGame();allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block';$('#profileCard').style.display='none';$('#lobbyQuick').style.display='none';questTrack('play',1)}
+function start(){sfx.click();lastInfinite=false;newGame();allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block';$('#profileCard').style.display='none';questTrack('play',1)}
 function startInfinite(){sfx.click();lastInfinite=true;newGame(true);allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block';questTrack('play',1)}
 function retry(){sfx.click();if(lastInfinite)newGame(true);else newGame();allScreens.forEach(id=>show(id,false));$('#pauseBtn').style.display='block'}
 function pause(){if(M)return;if(G&&G.state==='play'){G.state='pause';joy=null;show('#pause',true)}}
 function resume(){if(G&&G.state==='pause'){G.state='play';show('#pause',false)}}
-function home(){sfx.click();if(M){G=null;['#end','#pause','#levelup'].forEach(id=>show(id,false));$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none';show('#mpPage',true);mpLobbyUI();return}G=null;['#end','#pause','#levelup','#battlePage'].forEach(id=>show(id,false));show('#lobby',true);$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none';$('#profileCard').style.display='flex';$('#lobbyQuick').style.display='flex';updateProfileCard()}
+function home(){sfx.click();if(M){G=null;['#end','#pause','#levelup'].forEach(id=>show(id,false));$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none';show('#mpPage',true);mpLobbyUI();return}G=null;['#end','#pause','#levelup','#battlePage'].forEach(id=>show(id,false));show('#lobby',true);$('#pauseBtn').style.display='none';$('#ultBtn').style.display='none';$('#profileCard').style.display='flex';updateProfileCard()}
 function endGame(win){G.state='over';joy=null;$('#pauseBtn').style.display='none';$('#retryBtn').style.display=M?'none':'';if(M)setTimeout(mpUpd,0);$('#chatBtn').style.display='none';chatClose();$('#levelup').classList.remove('show');
   if(G.infinite){sfx.lose();const best=parseInt(localStorage.getItem('ccsg_infbest')||'0');
     if(G.wave>best)localStorage.setItem('ccsg_infbest',String(G.wave));
@@ -1166,7 +1351,7 @@ cv.addEventListener('pointermove',e=>{if(joy&&e.pointerId===joy.id){joy.x=e.clie
 const up=e=>{if(joy&&e.pointerId===joy.id)joy=null};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 
 let last=performance.now(),clock=0;
-function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;clock+=dt;if(G&&G.state==='play')update(dt);if(G&&G.state==='ult')updateUlt(dt);if(G&&M)mpTick(dt);if(dog){try{if(G&&G.state==='ult')renderUlt(clock);else render(clock)}catch(err){console.error(err);if(G&&G.state==='ult'){G.ultState=null;G.state='play'}}}requestAnimationFrame(loop)}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;clock+=dt;tbSync();if(G&&G.state==='play')update(dt);if(G&&G.state==='ult')updateUlt(dt);if(G&&M)mpTick(dt);if(dog){try{if(G&&G.state==='ult')renderUlt(clock);else render(clock)}catch(err){console.error(err);if(G&&G.state==='ult'){G.ultState=null;G.state='play'}}}requestAnimationFrame(loop)}
 let M=null;const skinCv={};
 function mpSend(o){if(!M)return;if(M.host){for(const c of M.conns)if(c.open&&c.pid)c.send(o)}else if(M.conn&&M.conn.open)M.conn.send(o)}
 function mpStatus(s){$('#mpStatus').textContent=s}
