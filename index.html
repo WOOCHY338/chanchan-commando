@@ -757,7 +757,7 @@ function processImg(src){return new Promise((res,rej)=>{const im=new Image();im.
   const o=document.createElement('canvas');o.width=x1-x0+1;o.height=y1-y0+1;o.getContext('2d').drawImage(c,-x0,-y0);o.w=o.width;o.h=o.height;
   res({cv:o,url:o.toDataURL()})};im.src=src})}
 const skinURLs={};
-function loadDog(){const sk=SKINS.find(s=>s.id===currentSkin);return processImg(sk?sk.src:DOG_SRC).then(r=>{dog=r.cv;dogURL=r.url}).catch(()=>{return processImg(DOG_SRC).then(r=>{dog=r.cv;dogURL=r.url;currentSkin='default';localStorage.setItem('ccsg_skin','default')})})}
+function loadDog(){const sk=SKINS.find(s=>s.id===currentSkin);if(sk&&skinCv[sk.id]){dog=skinCv[sk.id];dogURL=skinURLs[sk.id]||dog.toDataURL();return Promise.resolve()}return processImg(sk?sk.src:DOG_SRC).then(r=>{if(sk&&sk.hue!=null){const shifted=hueShift(r.cv,sk.hue,sk.sat||1);dog=shifted;dog.w=shifted.width;dog.h=shifted.height;dogURL=shifted.toDataURL()}else{dog=r.cv;dogURL=r.url}}).catch(()=>{return processImg(DOG_SRC).then(r=>{dog=r.cv;dogURL=r.url;currentSkin='default';localStorage.setItem('ccsg_skin','default')})})}
 function loadAllSkins(){return Promise.all(SKINS.map(s=>processImg(s.src).then(r=>{
   if(s.hue!=null){const shifted=hueShift(r.cv,s.hue,s.sat||1);skinURLs[s.id]=shifted.toDataURL();skinCv[s.id]=shifted}
   else{skinURLs[s.id]=r.url;skinCv[s.id]=r.cv}}).catch(()=>{})))}
